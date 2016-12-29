@@ -1,7 +1,7 @@
 import random
 import numpy
 
-def printSudoku(sudoku,k=3):
+def formattedString(sudoku,k=3):
     sudokuSize = k*k
     row = ""
     for i in range(0,sudokuSize):
@@ -9,7 +9,7 @@ def printSudoku(sudoku,k=3):
             row += "\n"
         if((i % k) == 0):
             row += "\n\n"
-            
+
         for j in range(0,sudokuSize):
             if(sudoku[i][j] < 10):
                 value = "0"+str(sudoku[i][j])
@@ -19,10 +19,9 @@ def printSudoku(sudoku,k=3):
 
             if(((j+1) % k) == 0):
                 row += "    "
+    return(row)
 
-    print(row)
-        
-def swapNumbers(k=3):
+def swapNumbers(sudoku, k=3):
     sudokuSize = k*k
     first  = random.randint(1,sudokuSize)
     second = random.randint(1,sudokuSize)
@@ -31,18 +30,22 @@ def swapNumbers(k=3):
         second = random.randint(1,sudokuSize)
 
     for i in range(0,sudokuSize):
-        ifst = sudoku[i].index(first) 
+        ifst = sudoku[i].index(first)
         iscd = sudoku[i].index(second)
         sudoku[i][ifst], sudoku[i][iscd] = sudoku[i][iscd], sudoku[i][ifst]
 
-def swapRows(k=3):
+    return sudoku
+
+def swapRows(sudoku, k=3):
     block = random.randint(0,k-1)
     chosenColumn1 = block*k
     chosenColumn2 = chosenColumn1+random.randint(1,k-1)
 
     sudoku[chosenColumn1], sudoku[chosenColumn2] = sudoku[chosenColumn2], sudoku[chosenColumn1]
 
-def swapBlocks(k=3):
+    return sudoku
+
+def swapBlocks(sudoku, k=3):
     block1 = random.randint(0,k-1)
     block2 = random.randint(0,k-1)
 
@@ -52,13 +55,17 @@ def swapBlocks(k=3):
     for i in range(0,k-1):
         sudoku[block1*k+i], sudoku[block2*k+i] = sudoku[block2*k+i], sudoku[block1*k+i]
 
-def rotateSudoku(k=3):
+    return sudoku
+
+def rotateSudoku(sudoku, k=3):
     sudokuSize = k*k
     tmp = numpy.array(sudoku, int)
     rotated = numpy.rot90(tmp).tolist()
 
     for i in range(0,sudokuSize):
         sudoku[i] = rotated[i]
+
+    return sudoku
 
 # Standardfeld erzeugen
 def generateInitialSudoku(k=3):
@@ -71,27 +78,28 @@ def generateInitialSudoku(k=3):
 
         if(i % k == 0 and i > 0):
             offset += 1
-            
+
         for j in range(0,sudokuSize):
             tmp[j] = ((j+offset) % (sudokuSize)) + 1
-                
+
         array[i] = tmp
         offset = (offset+k) % sudokuSize
-    
-    return array   
 
-# Standardfeld (global sudoku) modifizieren
-def generateFilledSudoku(k=3):
+    return array
+
+# Standardfeld modifizieren
+def generateFilledSudoku(sudoku, k=3):
     for i in range(1,5):
         for j in range(0,random.randint(k,k*2)):
             if(i == 1):
-                swapNumbers(k)
+                swapNumbers(sudoku, k)
             elif(i == 2):
-                swapRows(k)
+                swapRows(sudoku, k)
             elif(i == 3):
-                swapBlocks(k)
+                swapBlocks(sudoku, k)
             else:
-                rotateSudoku(k)
+                rotateSudoku(sudoku, k)
+    return sudoku
 
 def removeNumbersInRow(sudoku,row,k=3,setSize=2):
     sudokuSize=k*k
@@ -106,7 +114,7 @@ def removeNumbersInRow(sudoku,row,k=3,setSize=2):
             if(sudoku[row][j] == randoms[i]):
                 sudoku[row][j] = 0
                 break
-    
+
     return sudoku
 
 def removeNumbers(sudoku,k=3,setSize=2):
@@ -115,10 +123,10 @@ def removeNumbers(sudoku,k=3,setSize=2):
 
     #while sudoku solvable
     return removeNumbersInRow(sudoku,row,k,setSize)
-    
+
 def generateSudoku(sudoku,k=3,level=2):
     sudokuSize = k*k
-    generateFilledSudoku(k)
+    generateFilledSudoku(sudoku, k)
 
     # Den if-else-Block kann man noch kürzen aber bevor der Solver steht änder ich mal noch nichts dran.
     # Wir können uns dann auch leichter über das Verfahren einigen und ob der Schwierigkeitsgrad so passt!
@@ -132,9 +140,4 @@ def generateSudoku(sudoku,k=3,level=2):
         # In jedem Block so viel wie möglich entfernen
         sudoku = removeNumbers(sudoku,k,setSize=4)
 
-    printSudoku(sudoku,k)
-
-#---------------------------------------------
-
-sudoku = generateInitialSudoku(k=3)
-generateSudoku(sudoku,k=3,level=3)
+    return sudoku
