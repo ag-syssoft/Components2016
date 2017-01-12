@@ -2,7 +2,7 @@ from flask import jsonify
 
 class Message():
 	# Beim Versenden wird der Sender von Camel gesetzt.
-	def __init__ (self, requestID, instruction, sudoku, sender=""):
+	def __init__ (self, requestID, sender, instruction, sudoku):
 		self.requestID   = requestID
 		self.sender      = sender
 		self.instruction = instruction
