@@ -1,5 +1,6 @@
 import random
 import numpy
+import math
 
 def formattedString(sudoku,k=3):
     sudokuSize = k*k
@@ -88,7 +89,10 @@ def generateInitialSudoku(k=3):
     return array
 
 # Standardfeld modifizieren
-def generateFilledSudoku(sudoku, k=3):
+def generateFilledSudoku(k=3):
+
+    sudoku = generateInitialSudoku(k=k)
+
     for i in range(1,5):
         for j in range(0,random.randint(k,k*2)):
             if(i == 1):
@@ -125,9 +129,6 @@ def removeNumbers(sudoku,k=3,setSize=2):
     return removeNumbersInRow(sudoku,row,k,setSize)
 
 def generateSudoku(sudoku,k=3,level=2):
-    sudokuSize = k*k
-    generateFilledSudoku(sudoku, k)
-
     # Den if-else-Block kann man noch kürzen aber bevor der Solver steht änder ich mal noch nichts dran.
     # Wir können uns dann auch leichter über das Verfahren einigen und ob der Schwierigkeitsgrad so passt!
     if(level == 1):

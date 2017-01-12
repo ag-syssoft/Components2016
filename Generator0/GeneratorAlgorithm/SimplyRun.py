@@ -1,5 +1,4 @@
-from SudokuInitializer import *
-from SudokuRemover import *
+from SudokuGenerator import *
 
 sudoku = generateInitialSudoku(k=3)
 sudoku = generateSudoku(sudoku,k=3,level=3)
