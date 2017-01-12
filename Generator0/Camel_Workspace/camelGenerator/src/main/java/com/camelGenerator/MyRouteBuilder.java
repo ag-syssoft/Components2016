@@ -14,7 +14,7 @@ public class MyRouteBuilder extends RouteBuilder
 	
     public void configure()
     {
-    	final String transferFolder = "C:/Users/temp/OneDrive/Projekte/Studium/Master/Komponententechnologien/Sudoku/transfer";
+    	final String transferFolder = "C:/Users/temp/OneDrive/Projekte/Studium/Master/Komponententechnologien/Sudoku/Generator0/transfer";
     	Processor py_to_json = new PyToJsonProcessor();
     	
         from("file:" + transferFolder + "/input" + "?noop=false") 	// noop=false löscht die Files nach der Verarbeitung / verschiebt sie nach .camel
