@@ -41,13 +41,14 @@ public class PyToJsonProcessor implements Processor
 	public void process(Exchange exchange) throws Exception
 	{
 		Message toProcess = exchange.getIn().copy();
-		String pyString = toProcess.getBody(String.class); //https://camel.apache.org/maven/current/camel-core/apidocs/org/apache/camel/Message.html#getBody(java.lang.Class)
+		String zmqString = toProcess.getBody(String.class); //https://camel.apache.org/maven/current/camel-core/apidocs/org/apache/camel/Message.html#getBody(java.lang.Class)
+		String [] msgArray = zmqString.split(";");
 		
 		String json = Json.createObjectBuilder()
-				.add("request-id", "ToDo")
-				.add("sender", "ToDo")
-				.add("instruction", "solve")
-				.add("sudoku", stringConverter(pyString))
+				.add("request-id", msgArray[0])
+				.add("sender", msgArray[1])
+				.add("instruction", msgArray[2])
+				.add("sudoku", stringConverter(msgArray[3]))
 				.build()
 				.toString();
 		
