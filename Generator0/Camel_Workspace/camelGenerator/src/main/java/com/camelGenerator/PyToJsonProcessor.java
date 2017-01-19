@@ -13,6 +13,7 @@ import org.apache.camel.Processor;
  *   http://stackoverflow.com/questions/18282872/why-json-test-program-doesnt-work
  */
 import javax.json.Json;
+import javax.json.JsonArrayBuilder;
 
 public class PyToJsonProcessor implements Processor
 {
@@ -48,7 +49,7 @@ public class PyToJsonProcessor implements Processor
 				.add("request_id", msgArray[0])
 				.add("sender", msgArray[1])
 				.add("instruction", msgArray[2])
-				.add("sudoku", stringConverter(msgArray[3]))
+				.add("sudoku", sudokuConverter(msgArray[3]))
 				.build()
 				.toString();
 		
@@ -56,13 +57,16 @@ public class PyToJsonProcessor implements Processor
 		exchange.setOut(toProcess);
 	}
 	
-	private String stringConverter(String pyString)
+	private JsonArrayBuilder sudokuConverter(String pyString)
 	{
-		/*
-		 * Fürs erste:
-		 * Einfach alle Werte des Feldes in einer Zeile, getrennt durch Kommata und ohne Leerzeichen.
-		 */
-		return pyString.replace("[", "").replace("]", "").replace(" ", "");
+		JsonArrayBuilder sudokuJSON =  Json.createArrayBuilder();
+		pyString = pyString.replace("[", "").replace("]", "").replace(" ", "");
+		String[] pyArray = pyString.split(",");
+		for (int indexerA = 0; indexerA < pyArray.length; indexerA++)
+		{
+			sudokuJSON.add(Integer.valueOf(pyArray[indexerA]));
+		}
+		return sudokuJSON;
 	}
 
 }
