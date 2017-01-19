@@ -24,7 +24,9 @@ public class MyRouteBuilder extends RouteBuilder
     		.convertBodyTo(String.class) 							// Der Body an sicht ist zunächst vom Typ GenericFile, repräsentiert also noch den urspr File Endpoint.
 	    	.process(py_to_json)									// Konvertieurng, siehe Klasse PyToJsonProcessor
 	    	.log("${body}")											// Print auf die Konsole
-	    	.to("file:" + transferFolder + "/output");				// Neue Datei in den Output-Folder
+	    	.to("rabbitmq://136.199.51.111/inExchange?username=kompo&password=kompo&skipQueueDeclare=true");
+
+	    	//.to("file:" + transferFolder + "/output");				// Neue Datei in den Output-Folder
     	
     }
 

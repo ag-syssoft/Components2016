@@ -45,7 +45,7 @@ public class PyToJsonProcessor implements Processor
 		String [] msgArray = zmqString.split(";");
 		
 		String json = Json.createObjectBuilder()
-				.add("request-id", msgArray[0])
+				.add("request_id", msgArray[0])
 				.add("sender", msgArray[1])
 				.add("instruction", msgArray[2])
 				.add("sudoku", stringConverter(msgArray[3]))
