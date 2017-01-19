@@ -6,7 +6,7 @@ pip install pyzmq
 ##Notizen fuer Do 19.01
 
 ###Handler.py
-soll eine kleine Datenbank zum Speichern der Informationen verwendet werden? ~> evt tinydb 
+Eine Liste zum Speichern der "DB"
 
 DB-STRUCTURE  
 * sudokuID
@@ -19,14 +19,14 @@ Ablauf im Handler:
 * gelöstes Sudoku erstellen
 * Element in die DB schreiben
 * Camel-Nachicht verschicken
-    
+
 ####solved-one:  
 * check difficulty from DB
 * falls difficulty erreicht ~> done
 * update sudoku state to DB (+ add requestID to db.requestIDs list)
 * remove number from sudoku
 * Camel-Nachicht verschicken
-    
+
 ####solved-many:  
 * get lastState from DB
 * ~> gleiches Prozedere wie bei solved-one (jedoch stellt sich hier noch eine Frage ~> falls noch weitere Felder geleert werden sollen, ist unser Ablauf nicht schön, da wir random Felder entfernen)
