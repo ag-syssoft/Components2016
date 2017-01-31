@@ -1,13 +1,11 @@
+import uuid
 from flask import jsonify
 
 class Message():
 
 	def __init__ (self, requestID="-1", senderAdress="", instruction="solve", sudoku="[[]]"):
-
-
-
 		self.requestID   = requestID
-		self.sender      = "rest:post:" + senderAdress + "/api/message"
+		self.sender      = "rest:post:" + senderAdress + "/api:/message"
 		self.instruction = instruction
 		self.sudoku      = sudoku
 
@@ -19,3 +17,6 @@ class Message():
 				'sudoku': self.sudoku,
 				}
 		return jsonify({'message': message})
+
+	def createGUID():
+		return uuid.uuid1()

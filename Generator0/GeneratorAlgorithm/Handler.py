@@ -1,6 +1,7 @@
+import math
 from Message import *
 from SudokuGenerator import *
-import math
+from Bridge import *
 
 ## Note
 ## Zur Zeit akzeptieren wir nur Sudokus die mindestes 9 * 9 Felder besitzen.
@@ -8,6 +9,8 @@ import math
 ## dass wir zu beginn eine fixe Zahl an Werten aus dem Sudoku löschen können.
 
 class Handler():
+    global bridge
+    bridge = Bridge()
     global reqDictionary
     reqDictionary={
         #'reqID123': (difficulty, finishedState, cleanedNumbers, memorySet)
@@ -27,6 +30,9 @@ class Handler():
 
             # send camel-msg
             # TODO
+            rID = Message.createGUID()
+            msgToSend = Message(requestID=rID, senderAdress="", instruction="solve", sudoku="[[]]")
+            bridge.send(msgToSend)
 
         # instruction: solved one
         elif(msg.instruction == "solved: one"):
@@ -72,7 +78,7 @@ class Handler():
                 lastNumber = reqDictionary[msg.requestID][2].pop()
                 sudoku[lastNumber[0]][lastNumber[1]] = finishedSudoku[lastNumber[0]][lastNumber[1]]
                 memorySet = {}
-            
+
             # remove numbers and check if already removed
             sudoku, cleanedNumbers = emptyField(sudoku,1)
             memorySet = memorySet.add(cleanedNumbers)
