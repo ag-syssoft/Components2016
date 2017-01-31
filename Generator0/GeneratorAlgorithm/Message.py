@@ -5,7 +5,7 @@ class Message():
 
 	def __init__ (self, requestID="-1", senderAdress="", instruction="solve", sudoku="[[]]"):
 		self.requestID   = requestID
-		self.sender      = "rest:post:" + senderAdress + "/api:/message"
+		self.sender      = "rest:post:/message?host=" + senderAdress + ":80/api"
 		self.instruction = instruction
 		self.sudoku      = sudoku
 
