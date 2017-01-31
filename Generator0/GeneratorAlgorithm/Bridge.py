@@ -29,6 +29,6 @@ class Bridge():
         self.disconnect()
 
 if __name__ == "__main__":
-    toSend = Message(requestID="936DA01F-9ABD-4D9D-80C7-02AF85C822A8", senderAdress="136.199.204.20" ,sudoku=[[1,2,3],[4,5,6]])
+    toSend = Message(requestID="936DA01F-9ABD-4D9D-80C7-02AF85C822A8", senderAdress="136.199.204.20", instruction="register", sudoku=[[1,2,3],[4,5,6]])
     myBridge = Bridge()
     myBridge.send(toSend)
