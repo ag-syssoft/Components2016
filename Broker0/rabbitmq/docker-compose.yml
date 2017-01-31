@@ -1,0 +1,10 @@
+rabbitmq:
+  container_name: broker_rabbitmq
+  restart: unless-stopped
+  image: rabbitmq:3.6-management
+  volumes:
+    - ./rabbitmq_config:/etc/rabbitmq
+  ports:
+    - 8080:15672
+    - 5672:5672
+
