@@ -2,7 +2,7 @@ from SudokuGenerator import *
 
 sudoku = generateInitialSudoku(k=3)
 sudoku, list = emptyField(sudoku,17)
-print(formattedString(sudoku,k=3))
+print(formattedString(sudoku))
 
 reqDictionary={
     'ID1': ('diff', 'finishedSudoku', [(88,88),(99,99)])

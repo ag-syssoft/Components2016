@@ -10,7 +10,7 @@ import math
 class Handler():
     global reqDictionary
     reqDictionary={
-        #'reqID123': (difficulty, finishedState, cleanedNumbers)
+        #'reqID123': (difficulty, finishedState, cleanedNumbers, memorySet)
     }
 
 
@@ -19,15 +19,14 @@ class Handler():
         if(msg.instruction.startswith("generate")):
             k = int(math.sqrt(len(msg.sudoku)))
             difficulty = msg.instruction[-2:-1]
-            sudoku = generateSudoku(generateFilledSudoku(k),k)
+            sudoku = generateFilledSudoku(k)
 
             # initial cleanup (remove 8 numbers)
-            sudoku, cleanedNumbers = emptyFields(sudoku,8)
+            sudoku, cleanedNumbers = emptyField(sudoku,8)
             reqDictionary[msg.requestID] = (difficulty, sudoku, cleanedNumbers)
 
             # send camel-msg
             # TODO
-            # break?
 
         # instruction: solved one
         elif(msg.instruction == "solved: one"):
@@ -39,16 +38,17 @@ class Handler():
             for row in msg.sudoku:
                 for elem in row:
                     if elem == 0:
-                        emptyCounter++
+                        emptyCounter = emptyCounter + 1
 
             percentCounter = (emptyCounter * 100) / (k*k)
 
             # check if we are done or if need still need to 'empty' fields (difficulty)
-            if (tmpDifficulty == "1" and percentCounter < 0.7) or (tmpDifficulty == "2" and percentCounter < 0.5)
-                or (tmpDifficulty == "3" and percentCounter < 0.3):
+            if (tmpDifficulty == "1" and percentCounter < 0.7) or (tmpDifficulty == "2" and percentCounter < 0.5) \
+               or (tmpDifficulty == "3" and percentCounter < 0.3):
+                print("todo")
                 # if achieved -> sudoku finished for GUI -> send camel-msg
                 # TODO
-                # break
+                # break!
 
             # remove numbers
             sudoku, cleanedNumbers = emptyField(sudoku,1)
@@ -58,23 +58,26 @@ class Handler():
 
             # send camel-msg to broker (request to solve)
             # TODO
-            # break
 
         # instruction: solved many
         elif(msg.instruction == "solved: many"):
             # recover previous state
             lastNumber = reqDictionary[msg.requestID][2].pop()
-            (difficulty, finishedSudoku, oldNumbers) = reqDictionary[msg.requestID]
+            (difficulty, finishedSudoku, oldNumbers, memorySet) = reqDictionary[msg.requestID]
             sudoku = msg.sudoku
             sudoku[lastNumber[0]][lastNumber[1]] = finishedSudoku[lastNumber[0]][lastNumber[1]]
 
-            # remove numbers
+            # Check whether the number has already been removed
+            if (len(memorySet) == len(sudoku)):
+                lastNumber = reqDictionary[msg.requestID][2].pop()
+                sudoku[lastNumber[0]][lastNumber[1]] = finishedSudoku[lastNumber[0]][lastNumber[1]]
+                memorySet = {}
+            
+            # remove numbers and check if already removed
             sudoku, cleanedNumbers = emptyField(sudoku,1)
+            memorySet = memorySet.add(cleanedNumbers)
             cleanedNumbers = oldNumbers.extend(cleanedNumbers)
-            reqDictionary[msg.requestID] = (difficutly, finishedSudoku, cleanedNumbers)
-
-            # prevent endless loop
-            # TODO
+            reqDictionary[msg.requestID] = (difficutly, finishedSudoku, cleanedNumbers, memorySet)
 
             # send camel-msg to broker (request to solver)
             # TODO
