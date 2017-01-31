@@ -7,7 +7,7 @@ class Message():
 
 
 		self.requestID   = requestID
-		self.sender      = "rest:post:" + sender + "/api/message"
+		self.sender      = "rest:post:" + senderAdress + "/api/message"
 		self.instruction = instruction
 		self.sudoku      = sudoku
 
