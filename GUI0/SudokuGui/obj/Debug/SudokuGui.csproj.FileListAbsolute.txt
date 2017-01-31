@@ -1,0 +1,9 @@
+e:\documents\visual studio 2015\Projects\SudokuGui\SudokuGui\bin\Debug\SudokuGui.exe.config
+e:\documents\visual studio 2015\Projects\SudokuGui\SudokuGui\obj\Debug\SudokuGui.csprojResolveAssemblyReference.cache
+e:\documents\visual studio 2015\Projects\SudokuGui\SudokuGui\obj\Debug\SudokuGui.Form1.resources
+e:\documents\visual studio 2015\Projects\SudokuGui\SudokuGui\obj\Debug\SudokuGui.Properties.Resources.resources
+e:\documents\visual studio 2015\Projects\SudokuGui\SudokuGui\obj\Debug\SudokuGui.csproj.GenerateResource.Cache
+e:\documents\visual studio 2015\Projects\SudokuGui\SudokuGui\bin\Debug\SudokuGui.exe
+e:\documents\visual studio 2015\Projects\SudokuGui\SudokuGui\bin\Debug\SudokuGui.pdb
+e:\documents\visual studio 2015\Projects\SudokuGui\SudokuGui\obj\Debug\SudokuGui.exe
+e:\documents\visual studio 2015\Projects\SudokuGui\SudokuGui\obj\Debug\SudokuGui.pdb
