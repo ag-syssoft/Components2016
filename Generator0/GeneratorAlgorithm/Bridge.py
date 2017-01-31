@@ -12,14 +12,17 @@ class Bridge():
         self.zmqSocket = self.zmqContext.socket(zmq.PUSH)
         self.zmqSocket.bind("tcp://" + zmqIP + ":" + zmqPORT)
         self.seperator = seperator
+        self.initialized = True
 
     def send(self, message):
         toSend = str(message.requestID) + self.seperator + message.sender + self.seperator + message.instruction + self.seperator + str(message.sudoku)
         self.zmqSocket.send(bytes(toSend, 'utf-8'))
 
     def disconnect (self):
-        self.zmqSocket.close()
-        self.zmqContext.term()
+        if (self.initialized):
+            self.zmqSocket.close()
+            self.zmqContext.term()
+            self.initialized = False
 
     def __del__(self):
         # Kein garbage collecting vor Nachrichtenversand
