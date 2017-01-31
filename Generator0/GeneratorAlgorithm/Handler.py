@@ -20,19 +20,21 @@ class Handler():
             k = int(math.sqrt(len(msg.sudoku)))
             difficulty = msg.instruction[-2:-1]
             sudoku = generateSudoku(generateFilledSudoku(k),k)
-            
+
             # initial cleanup (remove 8 numbers)
             sudoku, cleanedNumbers = emptyFields(sudoku,8)
-            reqDictionary[msg.requestID] = (difficulty, sudoku, cleanedNumbers) 
+            reqDictionary[msg.requestID] = (difficulty, sudoku, cleanedNumbers)
 
-            # TODO Camel-Nachicht schicken
+            # send camel-msg
+            # TODO
+            # break?
 
         # instruction: solved one
         elif(msg.instruction == "solved: one"):
             k = int(math.sqrt(len(msg.sudoku)))
             tmpDifficulty = reqDictionary[msg.requestID][0]
-            
-            # now we need the number of 'empty' fields
+
+            # get number of 'empty' fields
             emptyCounter = 0
             for row in msg.sudoku:
                 for elem in row:
@@ -40,19 +42,23 @@ class Handler():
                         emptyCounter++
 
             percentCounter = (emptyCounter * 100) / (k*k)
-                        
-            # and check if we are done or if need still need to 'empty' fields
+
+            # check if we are done or if need still need to 'empty' fields (difficulty)
             if (tmpDifficulty == "1" and percentCounter < 0.7) or (tmpDifficulty == "2" and percentCounter < 0.5)
                 or (tmpDifficulty == "3" and percentCounter < 0.3):
-                # TODO send sudoku to broker (finished for GUI)
-                
+                # if achieved -> sudoku finished for GUI -> send camel-msg
+                # TODO
+                # break
+
             # remove numbers
             sudoku, cleanedNumbers = emptyField(sudoku,1)
             (difficulty, finishedSudoku, oldNumbers) = reqDictionary[msg.requestID]
             cleanedNumbers = oldNumbers.extend(cleanedNumbers)
             reqDictionary[msg.requestID] = (difficutly, finishedSudoku, cleanedNumbers)
-            
-            # TODO send to broker (request to solver)
+
+            # send camel-msg to broker (request to solve)
+            # TODO
+            # break
 
         # instruction: solved many
         elif(msg.instruction == "solved: many"):
@@ -67,7 +73,11 @@ class Handler():
             cleanedNumbers = oldNumbers.extend(cleanedNumbers)
             reqDictionary[msg.requestID] = (difficutly, finishedSudoku, cleanedNumbers)
 
-            # TODO send to broker (request to solver)
+            # prevent endless loop
+            # TODO
+
+            # send camel-msg to broker (request to solver)
+            # TODO
         else:
             print("Some error occured!")
 
