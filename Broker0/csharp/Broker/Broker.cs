@@ -120,6 +120,7 @@ namespace Broker
         public bool unregister(String uri)
         {
             Component c = registered.Find(x => x.uri.Equals(uri));
+            if (c == null) return false;
             configureRoute(c);
             return registered.Remove(c);
         }
@@ -148,9 +149,18 @@ namespace Broker
             else queue.Add(m);
         }
 
+        public void processPing( Message m)
+        {
+            m.instruction = "pong";
+            Component c = registered.Find(x => (x.uri == m.sender));
+            if (c == null) return;
+            sendMessage(m,c);
+        }
+
         public Component sendMessage(Message m, Component.Type recipientType)
         {
             String json = JsonConvert.SerializeObject(m);
+            json = json.Replace("request_id", "request-id");
             byte[] body = System.Text.Encoding.Default.GetBytes(json);
             if (recipientType == Component.Type.ALL)
             {
@@ -191,10 +201,20 @@ namespace Broker
        
         }
 
+        public void sendMessage(Message m,Component c)
+        {
+            m.sender = MY;
+            String json = JsonConvert.SerializeObject(m);
+            json = json.Replace("request_id", "request-id");
+            byte[] body = System.Text.Encoding.Default.GetBytes(json);
+            rqModel.BasicPublish(OUTEXCHANGE, c.id.ToString(), false, rqPPersistent, body);
+        }
+
         public void onRecieve(object sender, BasicDeliverEventArgs e)
         {
 				String message = System.Text.Encoding.Default.GetString(e.Body);
-				message.Replace("request-id", "request_id");
+				message = message.Replace("request-id", "request_id");
+            Console.WriteLine(message);
 				Message m;
 			try
 			{
@@ -206,7 +226,7 @@ namespace Broker
 			}
 				Console.Out.WriteLine("Received:\t " + m.instruction);
 				string instruction = m.instruction.Split(':')[0];
-				Console.WriteLine(m.printSudoku());
+				//Console.WriteLine(m.printSudoku());
 				switch (instruction)
 				{
 					case Message.Instruction.REGISTER:
@@ -221,6 +241,9 @@ namespace Broker
 					case Message.Instruction.SOLVED:
 						processSolved(m);
 						break;
+                    case Message.Instruction.PING:
+                        processPing(m);
+                        break;
 				}
 				if (stupid)
 				{
