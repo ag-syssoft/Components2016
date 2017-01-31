@@ -1,7 +1,7 @@
 from SudokuGenerator import *
 
 sudoku = generateInitialSudoku(k=3)
-sudoku, list = emptyField(sudoku,17)
+#sudoku, list = emptyField(sudoku,17)
 print(formattedString(sudoku))
 
 reqDictionary={

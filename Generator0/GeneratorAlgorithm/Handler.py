@@ -9,13 +9,15 @@ from Bridge import *
 ## dass wir zu beginn eine fixe Zahl an Werten aus dem Sudoku löschen können.
 
 class Handler():
+    global senderAddress
     global bridge
-    bridge = Bridge()
     global reqDictionary
+
+    senderAddress = "127.0.0.1"
+    bridge = Bridge()    
     reqDictionary={
         #'reqID123': (difficulty, finishedState, cleanedNumbers, memorySet)
     }
-
 
     def handle(msg):
         # instruction: generate
@@ -28,10 +30,9 @@ class Handler():
             sudoku, cleanedNumbers = emptyField(sudoku,8)
             reqDictionary[msg.requestID] = (difficulty, sudoku, cleanedNumbers)
 
-            # send camel-msg
-            # TODO
-            rID = Message.createGUID()
-            msgToSend = Message(requestID=rID, senderAdress="", instruction="solve", sudoku="[[]]")
+            # send message to camel
+            # TODO sender Address
+            msgToSend = Message(requestID=Message.createGUID(), senderAdress=senderAddress, instruction="solve", sudoku="[[]]")
             bridge.send(msgToSend)
 
         # instruction: solved one
@@ -53,8 +54,10 @@ class Handler():
                or (tmpDifficulty == "3" and percentCounter < 0.3):
                 print("todo")
                 # if achieved -> sudoku finished for GUI -> send camel-msg
+                msgToSend = Message(requestID=Message.createGUID(), senderAdress=senderAddress, instruction="display", sudoku="[[]]")
+                bridge.send(msgToSend)
                 # TODO
-                # break!
+                # while schreife sonst geht kein break
 
             # remove numbers
             sudoku, cleanedNumbers = emptyField(sudoku,1)
@@ -63,7 +66,8 @@ class Handler():
             reqDictionary[msg.requestID] = (difficutly, finishedSudoku, cleanedNumbers)
 
             # send camel-msg to broker (request to solve)
-            # TODO
+            msgToSend = Message(requestID=Message.createGUID(), senderAdress=senderAddress, instruction="solve", sudoku="[[]]")
+            bridge.send(msgToSend)
 
         # instruction: solved many
         elif(msg.instruction == "solved: many"):
@@ -86,7 +90,8 @@ class Handler():
             reqDictionary[msg.requestID] = (difficutly, finishedSudoku, cleanedNumbers, memorySet)
 
             # send camel-msg to broker (request to solver)
-            # TODO
+            msgToSend = Message(requestID=Message.createGUID(), senderAdress=senderAddress, instruction="solve", sudoku="[[]]")
+            bridge.send(msgToSend)
         else:
             print("Some error occured!")
 
