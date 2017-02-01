@@ -11,7 +11,7 @@ class Message():
 
 	def __init__ (self, requestID="-1", senderAddress="", instruction="solve", sudoku="[[]]"):
 		self.requestID   = requestID
-		self.sender      = senderAdress
+		self.sender      = senderAddress
 		self.instruction = instruction
 		self.sudoku      = sudoku
 
