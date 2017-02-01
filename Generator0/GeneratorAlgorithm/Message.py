@@ -3,9 +3,9 @@ from flask import jsonify
 
 class Message():
 
-	def __init__ (self, requestID="-1", senderAdress="", instruction="solve", sudoku="[[]]"):
+	def __init__ (self, requestID="-1", senderAddress="", instruction="solve", sudoku="[[]]"):
 		self.requestID   = requestID
-		self.sender      = "rest:post:/message?host=" + senderAdress + ":80/api"
+		self.sender      = "rest:post:/message?host=" + senderAddress + ":80/api"
 		self.instruction = instruction
 		self.sudoku      = sudoku
 

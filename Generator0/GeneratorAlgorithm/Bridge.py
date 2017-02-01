@@ -23,7 +23,6 @@ class Bridge():
             self.zmqSocket.close()
             self.zmqContext.term()
             self.initialized = False
-            print("hey")
 
     def __del__(self):
         # Kein garbage collecting vor Nachrichtenversand
