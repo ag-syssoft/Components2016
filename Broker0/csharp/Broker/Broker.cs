@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Newtonsoft.Json;
@@ -19,9 +21,13 @@ namespace Broker
         IBasicProperties rqPPersistent;
         List<Component> registered;
         List<Message> queue;
-
+		Dictionary<String, Message> loesungen;
+		Dictionary<Guid, String> currentRequest;
+		MD5 md5 = MD5.Create();
         public Broker()
         {
+			loesungen = new Dictionary<String, Message>();
+			currentRequest = new Dictionary<Guid, String>();
             registered = new List<Component>();
             queue = new List<Message>();
             rqFactory = new ConnectionFactory();
@@ -85,6 +91,17 @@ namespace Broker
             return true;
         }
 
+		public string getHash(int[] arr)
+		{
+			byte[] b = Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(arr));
+			byte[] hash = md5.ComputeHash(b);
+			StringBuilder sBuilder = new StringBuilder();
+			for (int i = 0; i < hash.Length; i++)
+			{
+				sBuilder.Append(hash[i].ToString("x2"));
+			}
+			return sBuilder.ToString();
+		}
         /// <summary>
         /// Sends a component to the camel instance. If the camel instance does not know the component, a new route is added, otherwise deleted
         /// Every component gets an id that is used as a routing key
@@ -127,19 +144,39 @@ namespace Broker
 
         public void processGenerated(Message m)
         {
-            try { registered.Find(x => x.uri == m.sender).busy = false; }
-            catch (NullReferenceException e) { }
+			string hash = getHash(m.sudoku);
+			if (loesungen.ContainsKey(hash))
+			{
+				Message rep;
+				loesungen.TryGetValue(hash, out rep);
+				rep.request_id = m.request_id;
+				rep.sender = MY;
+				sendMessage(rep, Component.Type.Generator);
+				return;
+			}
+			try { registered.Find(x => x.uri == m.sender).busy = false; }
+			catch (NullReferenceException e) { }
             m.sender = MY;
+			currentRequest.Add(m.request_id,getHash(m.sudoku));
             Component c = sendMessage(m, Component.Type.Solver);
             //Mark solver as busy
             //if no fitting component is currently registered, store it in queue to send it later
             if (c != null) c.busy = true;
             else queue.Add(m);
 
+
         }
 
         public void processSolved(Message m)
         {
+			//lookup in current requests
+			if (currentRequest.ContainsKey(m.request_id))
+			{
+				string hash;
+				currentRequest.TryGetValue(m.request_id, out hash);
+				loesungen.Add(hash, m);
+				currentRequest.Remove(m.request_id);
+			}
             registered.Find(x => x.uri == m.sender).busy = false;
             m.sender = MY;
             Component c = sendMessage(m, Component.Type.Generator);
@@ -226,7 +263,6 @@ namespace Broker
 			}
 				Console.Out.WriteLine("Received:\t " + m.instruction);
 				string instruction = m.instruction.Split(':')[0];
-				//Console.WriteLine(m.printSudoku());
 				switch (instruction)
 				{
 					case Message.Instruction.REGISTER:
