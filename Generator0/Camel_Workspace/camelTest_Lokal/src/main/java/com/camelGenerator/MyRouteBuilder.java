@@ -1,5 +1,7 @@
 package com.camelGenerator;
 
+import javax.json.JsonObject;
+
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 
@@ -24,9 +26,9 @@ public class MyRouteBuilder extends RouteBuilder
     		.convertBodyTo(String.class) 							// Der Body an sicht ist zunächst vom Typ GenericFile, repräsentiert also noch den urspr File Endpoint.
 	    	.process(py_to_json)									// Konvertieurng, siehe Klasse PyToJsonProcessor
 	    	.log("${body}")											// Print auf die Konsole
+	    	
 	    	//.to("rest://post:127.0.0.1/api/message");
 	    	.to("restlet:http://localhost:80/api/message?restletMethod=post");
-
 	    	//.to("file:" + transferFolder + "/output");				// Neue Datei in den Output-Folder
     	
     }

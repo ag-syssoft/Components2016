@@ -3,6 +3,7 @@ package com.camelGenerator;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
+import org.restlet.data.MediaType;
 
 /*
  * Für dieses import waren zwei neue maven-pom dependencies notwendig:
@@ -14,6 +15,7 @@ import org.apache.camel.Processor;
  */
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
 
 public class PyToJsonProcessor implements Processor
 {
@@ -45,15 +47,15 @@ public class PyToJsonProcessor implements Processor
 		String zmqString = toProcess.getBody(String.class); //https://camel.apache.org/maven/current/camel-core/apidocs/org/apache/camel/Message.html#getBody(java.lang.Class)
 		String [] msgArray = zmqString.split(";");
 		
-		String json = Json.createObjectBuilder()
+		JsonObject json = Json.createObjectBuilder()
 				.add("request_id", msgArray[0])
 				.add("sender", msgArray[1])
 				.add("instruction", msgArray[2])
 				.add("sudoku", sudokuConverter(msgArray[3]))
-				.build()
-				.toString();
+				.build();
 		
 		toProcess.setBody(json);
+		toProcess.setHeader(Exchange.CONTENT_TYPE, MediaType.APPLICATION_JSON);
 		exchange.setOut(toProcess);
 	}
 	
