@@ -45,19 +45,16 @@ class Handler():
 
             # initial cleanup (remove 8 numbers)
             sudoku, cleanedNumbers = emptyField(sudoku,8)
-            #rID = Message.createGUID()
-            rID = "test-solvedMany-id1"
+            rID = Message.createGUID()
             reqDictionary[rID] = (difficulty, sudoku, cleanedNumbers, (set()), msg.requestID)
 
             # send message to camel
             # TODO sender Address
             msgToSend = Message(requestID=rID, senderAddress=senderAddress, instruction="solve", sudoku=sudoku)
-            #bridge.send(msgToSend)
-            print(formattedString(sudoku))
+            bridge.send(msgToSend)
 
         # instruction: solved one
         elif(msg.instruction == "solved:one"):
-            print("case:solved:one")
             k = int(math.sqrt(len(msg.sudoku)))
             tmpDifficulty = reqDictionary[msg.requestID][0]
 
@@ -71,34 +68,30 @@ class Handler():
             percentCounter = (emptyCounter * 100) / (k*k)
 
             # check if we are done or if need still need to 'empty' fields (difficulty)
-            #if (tmpDifficulty == "1" and percentCounter < 0.7) or (tmpDifficulty == "2" and percentCounter < 0.5) \
-            #   or (tmpDifficulty == "3" and percentCounter < 0.3):
-        #        print("finished -> send to GUI")(requestID=Message.createGUID(), senderAddress=senderAddress, instruction="generate:[difficulty:1]", sudoku=sudoku)
-                # if achieved -> sudoku finished for GUI -> send camel-msg
-                #msgToSend = Message(requestID=reqDictionary[msg.requestID][4], senderAddress=senderAddress, instruction="display", sudoku=sudoku)
-                #bridge.send(msgToSend)
-                #del reqDictionary[msg.requestID]
-                #return
+            if (tmpDifficulty == "1" and percentCounter < 0.7) or (tmpDifficulty == "2" and percentCounter < 0.5) \
+              or (tmpDifficulty == "3" and percentCounter < 0.3):
+                #if achieved -> sudoku finished for GUI -> send camel-msg
+                msgToSend = Message(requestID=reqDictionary[msg.requestID][4], senderAddress=senderAddress, instruction="display", sudoku=sudoku)
+                bridge.send(msgToSend)
+                del reqDictionary[msg.requestID]
+                return
 
             # remove numbers
             sudoku = msg.sudoku
             sudoku, cleanedNumbers = emptyField(sudoku,1)
             (difficulty, finishedSudoku, oldNumbers, memorySet, firstID) = reqDictionary[msg.requestID]
             del reqDictionary[msg.requestID]
-            cleanedNumbers = oldNumbers.extend(cleanedNumbers)
-            #rID = Message.createGUID()
-            rID = "test-solvedMany-id1"
+            cleanedNumbers = oldNumbers + cleanedNumbers
+            rID = Message.createGUID()
             reqDictionary[rID] = (difficulty, finishedSudoku, cleanedNumbers, memorySet, firstID)
 
             # send camel-msg to broker (request to solve)
             msgToSend = Message(requestID=rID, senderAddress=senderAddress, instruction="solve", sudoku=sudoku)
-            #bridge.send(msgToSend)
-
+            bridge.send(msgToSend)
+            
         # instruction: solved many
         elif(msg.instruction == "solved:many"):
-            print("case:solved:many")
             # recover previous state
-            #print(reqDictionary[msg.requestID][2])
             lastNumber = reqDictionary[msg.requestID][2].pop()
             (difficulty, finishedSudoku, oldNumbers, memorySet, firstID) = reqDictionary[msg.requestID]
             del reqDictionary[msg.requestID]
@@ -113,15 +106,15 @@ class Handler():
 
             # remove numbers and check if already removed
             sudoku, cleanedNumbers = emptyField(sudoku,1)
-            memorySet = memorySet.add(cleanedNumbers)
-            cleanedNumbers = oldNumbers.extend(cleanedNumbers)
+            memorySet = memorySet.add(cleanedNumbers[0])
+            cleanedNumbers = oldNumbers + cleanedNumbers
             rID = Message.createGUID()
-            #rID = "test-solvedMany-id1"
-            reqDictionary[rID] = (difficutly, finishedSudoku, cleanedNumbers, memorySet, firstID)
+            reqDictionary[rID] = (difficulty, finishedSudoku, cleanedNumbers, memorySet, firstID)
 
             # send camel-msg to broker (request to solver)
             msgToSend = Message(requestID=rID, senderAddress=senderAddress, instruction="solve", sudoku=sudoku)
-            #bridge.send(msgToSend)
+            bridge.send(msgToSend)
+                        
         else:
             print("Some error occured!")
 

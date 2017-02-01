@@ -8,11 +8,6 @@ sudoku = generateInitialSudoku(k=3)
 #print(formattedString(sudoku))
 #print(sudoku)
 
-a = set()
-a.add(1)
-print(a)
-
-
 senderAddress = "127.0.0.1"
 hdl = Handler(senderAddress)
 
@@ -24,6 +19,9 @@ sudoku, list = emptyField(sudoku,5)
 
 msg3 = Message(requestID="test-solvedMany-id1", senderAddress=senderAddress, instruction="solved:many", sudoku=sudoku)
 hdl.handle(msg3)
+
+#dic = hdl.getDictionary
+#print(dic["test-solved1-id1"][0])
 
 msg2 = Message(requestID="test-solved1-id1", senderAddress=senderAddress, instruction="solved:one", sudoku=sudoku)
 hdl.handle(msg2)
