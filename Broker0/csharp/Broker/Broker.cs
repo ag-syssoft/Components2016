@@ -5,6 +5,7 @@ using System.Text;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Newtonsoft.Json;
+using System.Timers;
 
 namespace Broker
 {
@@ -21,8 +22,9 @@ namespace Broker
         IBasicProperties rqPPersistent;
         List<Component> registered;
         List<Message> queue;
-		Dictionary<String, Message> loesungen;
-		Dictionary<Guid, String> currentRequest;
+		Dictionary<string, Message> loesungen;
+		Dictionary<Guid, string> currentRequest;
+		Dictionary<string, DateTime> lastSeen;
 		MD5 md5 = MD5.Create();
         public Broker()
         {
@@ -30,6 +32,10 @@ namespace Broker
 			currentRequest = new Dictionary<Guid, String>();
             registered = new List<Component>();
             queue = new List<Message>();
+			lastSeen = new Dictionary<string, DateTime>();
+			Timer t = new Timer(300000);
+			t.Elapsed += cleanup;
+			t.Start();
             rqFactory = new ConnectionFactory();
             rqFactory.Uri = SELFURI;
             IConnection conn = rqFactory.CreateConnection();
@@ -249,60 +255,73 @@ namespace Broker
 
         public void onRecieve(object sender, BasicDeliverEventArgs e)
         {
-				String message = System.Text.Encoding.Default.GetString(e.Body);
-				message = message.Replace("request-id", "request_id");
-            Console.WriteLine(message);
-				Message m;
+			String message = System.Text.Encoding.Default.GetString(e.Body);
+			message = message.Replace("request-id", "request_id");
+			Message m;
 			try
 			{
 				m = JsonConvert.DeserializeObject<Message>(message);
 			}
 			catch (Exception ex){
 				rqModel.BasicAck(e.DeliveryTag,false);
+				Console.WriteLine("Received wrong message");
 				return;
 			}
-				Console.Out.WriteLine("Received:\t " + m.instruction);
-				string instruction = m.instruction.Split(':')[0];
-				switch (instruction)
+			Console.Out.WriteLine("Received:\t " + m.instruction);
+			lastSeen[m.sender] = DateTime.Now;
+			string instruction = m.instruction.Split(':')[0];
+			switch (instruction)
+			{
+				case Message.Instruction.REGISTER:
+					register(m.instruction, m.sender);
+					break;
+				case Message.Instruction.UNREGISTER:
+					unregister(m.sender);
+					break;
+				case Message.Instruction.SOLVE:
+					processGenerated(m);
+					break;
+				case Message.Instruction.SOLVED:
+					processSolved(m);
+					break;
+                case Message.Instruction.PING:
+                    processPing(m);
+                    break;
+			}
+			if (stupid)
+			{
+				try
 				{
-					case Message.Instruction.REGISTER:
-						register(m.instruction, m.sender);
-						break;
-					case Message.Instruction.UNREGISTER:
-						unregister(m.sender);
-						break;
-					case Message.Instruction.SOLVE:
-						processGenerated(m);
-						break;
-					case Message.Instruction.SOLVED:
-						processSolved(m);
-						break;
-                    case Message.Instruction.PING:
-                        processPing(m);
-                        break;
-				}
-				if (stupid)
-				{
-					try
+					//Doesnt work this way, broker is never the sender
+					//Todo: change to identify already sent messages (looping)
+					if (registered.Find(x => x.uri == m.sender).type == Component.Type.Broker)
 					{
-						//Doesnt work this way, broker is never the sender
-						//Todo: change to identify already sent messages (looping)
-						if (registered.Find(x => x.uri == m.sender).type == Component.Type.Broker)
-						{
-							sendMessage(m, Component.Type.ALLEXCEPTBROKER);
-						}
-						else
-						{
-							sendMessage(m, Component.Type.ALL);
-						}
+						sendMessage(m, Component.Type.ALLEXCEPTBROKER);
 					}
-					catch (NullReferenceException err)
+					else
 					{
+						sendMessage(m, Component.Type.ALL);
+					}
+				}
+				catch (NullReferenceException err)
+				{
 
-					}
 				}
-				rqModel.BasicAck(e.DeliveryTag, false);
+			}
+			rqModel.BasicAck(e.DeliveryTag, false);
         }
+
+		public void cleanup(object sender,ElapsedEventArgs e)
+		{
+			foreach (KeyValuePair<string, DateTime> kp in lastSeen)
+			{
+				if (kp.Value.AddMinutes(5) < DateTime.Now)
+				{
+					Console.Out.WriteLine("Unregistering " + kp.Key + " due to inactivity");
+					unregister(kp.Key);
+				}
+			}
+		}
 
     }
 }
