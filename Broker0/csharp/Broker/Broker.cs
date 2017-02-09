@@ -319,6 +319,7 @@ namespace Broker
 				{
 					Console.Out.WriteLine("Unregistering " + kp.Key + " due to inactivity");
 					unregister(kp.Key);
+                    lastSeen.Remove(kp.Key);
 				}
 			}
 		}
