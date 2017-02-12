@@ -55,7 +55,6 @@ public class PyToJsonProcessor implements Processor
 				.build();
 		
 		toProcess.setBody(json);
-		toProcess.setHeader(Exchange.CONTENT_TYPE, MediaType.APPLICATION_JSON);
 		exchange.setOut(toProcess);
 	}
 	

@@ -2,10 +2,10 @@ import uuid
 import socket
 from flask import jsonify
 
-def getAdress(ipAddressPort=""):
-	if (ipAdressPort==""):
-		ipAdressPort = socket.gethostbyname(socket.gethostname())
-	return "restlet:http://" + ipAdressPort + "/api/message?restletMethod=post"
+def getAddress(ipAddressPort=""):
+	if (ipAddressPort==""):
+		ipAddressPort = socket.gethostbyname(socket.gethostname())
+	return "restlet:http://" + ipAddressPort + "/api/message?restletMethod=post"
 
 class Message():
 
