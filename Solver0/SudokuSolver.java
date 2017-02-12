@@ -1,4 +1,4 @@
-package Solver;
+package comp.solver;
 
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
@@ -17,14 +17,13 @@ public class SudokuSolver {
     private int boxsize;
 
     /**
-     *
      * @param field has to be of squarenumber*squarenumber length, else #IllegalArgumentException will be thrown. Free values = 0;
      */
     SudokuSolver(int[] field) {
         this.field = field;
         this.size = (int) sqrt(field.length);
         if (size * size != field.length) {
-            throw new IllegalArgumentException(size + "length not a square number " +field.length);
+            throw new IllegalArgumentException(size + "length not a square number " + field.length);
         }
         this.boxsize = (int) sqrt(size);
         if (boxsize * boxsize != size) {
@@ -35,6 +34,7 @@ public class SudokuSolver {
 
     /**
      * Searches for Sudokuresults in the given sudokufield.
+     *
      * @return 0 if no solutions exist, 1 if exactly one exists, or 2 if more then one exist.
      */
     int search() {
@@ -49,7 +49,7 @@ public class SudokuSolver {
                 int value = field[horizontal + (vertical * 9)];
                 IntVar v;
                 if (value > 0) {
-                    if(value>size) {
+                    if (value > size) {
                         throw new IllegalArgumentException(vertical + "/" + horizontal + " value > size: " + value);
                     } else {
                         v = new FixedIntVarImpl(vertical + "/" + horizontal, value, model);

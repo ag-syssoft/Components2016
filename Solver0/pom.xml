@@ -4,8 +4,8 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>ApacheCamelGID</groupId>
-  <artifactId>ApacheCamelAID</artifactId>
+  <groupId>comp.solver</groupId>
+  <artifactId>camel</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
 
@@ -43,7 +43,6 @@
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-rabbitmq</artifactId>
-      <version>2.18.1</version>
     </dependency>
 
     <dependency>
@@ -111,7 +110,7 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.5.0</version>
         <configuration>
-          <mainClass>ApacheCamelGID.MainApp</mainClass>
+          <mainClass>comp.solver.MainApp</mainClass>
           <includePluginDependencies>false</includePluginDependencies>
         </configuration>
       </plugin>

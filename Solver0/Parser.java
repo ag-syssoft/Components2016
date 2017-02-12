@@ -1,4 +1,4 @@
-package Solver;
+package comp.solver;
 
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
@@ -11,16 +11,18 @@ public class Parser {
 
     public static String parse(String input) {
 
-        /* Test fuer korrekten Empfang */
+        /* Test fuer korrekten Empfang / Debug */
         //System.out.println("Input:\n" + input);
 
         /* Dokument ueberpruefen. Erst einfache Ueberpruefung */
         String request = "";
+        // Sender also Absender wird nur bei der direkten Kommunikation benötigt
         //String sender = "";
         String instruction = "";
 
         int[] sudoku = {};
 
+        // Hier ggf. noch ueberarbeiten
         String modInput = input.replace("|", "").replace(" ", "").replace("\r", "").replace("\n", "").replace("\t", "");
 
         JSONParser parser = new JSONParser();
@@ -43,12 +45,10 @@ public class Parser {
                 for (int i = 0; i < sudokuArray.size(); i++) {
                     sudoku[i] = Integer.valueOf(String.valueOf((sudokuArray.get(i))));
                 }
-            } else {
-                // Was soll passieren, wenn kein sudoku mitgegeben wird, aber die Instruction "solve" lautet
             }
-
         } catch (ParseException e) {
-            e.printStackTrace();
+            return "ERROR";
+            //e.printStackTrace();
         }
 
         // Debug
@@ -75,7 +75,8 @@ public class Parser {
                         return answerJSON(request, "solved:many", sudoku);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    return "ERROR";
+                    //e.printStackTrace();
                 }
 
             default:
@@ -134,3 +135,6 @@ public class Parser {
     }
 
 }
+
+
+
