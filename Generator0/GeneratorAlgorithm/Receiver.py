@@ -1,9 +1,14 @@
 # URL: /api/message
 
 from Message import *
+import json
 from flask import Flask, jsonify, request
+from Bridge import *
+from Handler import Handler
 
 app = Flask(__name__)
+myBridge = Bridge()
+myHandler = Handler()
 
 @app.route('/api/message', methods=['POST'])
 def receive():
@@ -11,5 +16,27 @@ def receive():
 	print(m.json())
 	return m.json(), 201
 
+def handleMessage(rawMsg):
+	recvJson = json.loads(rawMsg)
+	recvMsg = Message(requestID=recvJson["request_id"], senderAddress=recvJson["sender"], instruction=recvJson["instruction"], sudoku=self.parseSudoku(recvJson["sudoku"]))
+	if recvMsg.instruction == "ping"
+		recvMsg.instruction = "pong"
+		myBridge.send(recvMsg)
+	elif recvMsg.instruction.startswith("solved")
+		handle(recvMsg)
+	elif recvMsg.instruction.startswith("generate")
+		handle(recvMsg)	
+	
+def parseSudoku(self, sudoku):
+	# Nimmt Sudoku-Flat-Array entgegen und gibt verschachteltes Array aus
+	# Fehlt: Excetion Handling bei falscher Sudko länge
+	parts = int(math.sqrt(len(sudoku)))
+	toReturn = [[]] * parts
+	for iA in range (parts):
+		for iB in range (parts):
+			toReturn[iA] += [sudoku[parts*iA+iB]]
+	return toReturn
+	
 if __name__ == '__main__':
 	app.run(debug=True,port=80,host='0.0.0.0')
+    myBridge.disconnect()
