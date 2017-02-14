@@ -120,7 +120,7 @@ def generateFilledSudoku(k=3):
     """
     sudoku = generateInitialSudoku(k=k)
 
-    for i in range(1,5):
+    for i in range(1,4):
         for j in range(0,random.randint(k,k*2)):
             if(i == 1):
                 swapNumbers(sudoku)
@@ -130,7 +130,7 @@ def generateFilledSudoku(k=3):
                 swapBlocks(sudoku)
             else:
                 rotateSudoku(sudoku)
-                
+
     return sudoku
 
 
