@@ -9,13 +9,11 @@ from Bridge import *
 ## dass wir zu beginn eine fixe Zahl an Werten aus dem Sudoku löschen können.
 
 class Handler():
-    global senderAddress
-    global bridge
     global reqDictionary
 
     # TODO sender Address **hier oder in __init__**
     senderAddress = ""
-    bridge = Bridge()
+    bridge= None
 
     """
     [key]   - reqID             - current request GUID
@@ -30,31 +28,17 @@ class Handler():
     }
 
 
-    def __init__(self, senderAddress):
-        senderAddress = senderAddress
+    def __init__(self, senderAddress, bridge):
+        self.senderAddress = senderAddress
+        self.bridge = bridge
 
 
     def getDictionary():
         return reqDictionary
 
-
-    def handle(self, msg):
-        """
-        Ruft je nach Instruction die entsprechende Handle-Funktion auf
-        """
-        if(msg.instruction.startswith("generate")):
-            handleGenerate(msg)
-        elif(msg.instruction == "solved:one"):
-            handleSolvedOne(msg)
-        elif(msg.instruction == "solved:many"):
-            handleSolvedMany(msg)
-        else:
-            print("Some error occured!")
-
-
-    def handleGenerate(msg):
+    def handleGenerate(self, msg):
         k = int(math.sqrt(len(msg.sudoku)))
-        difficulty = msg.instruction[-2:-1]
+        difficulty = msg.instruction[-1:]
         sudoku = generateFilledSudoku(k)
 
         # initial cleanup (remove 8 numbers)
@@ -63,11 +47,11 @@ class Handler():
         reqDictionary[rID] = (difficulty, sudoku, cleanedNumbers, (set()), msg.requestID)
 
         # send message to camel
-        msgToSend = Message(requestID=rID, senderAddress=senderAddress, instruction="solve", sudoku=sudoku)
-        bridge.send(msgToSend)
+        msgToSend = Message(requestID=rID, senderAddress=self.senderAddress, instruction="solve", sudoku=sudoku)
+        self.bridge.send(msgToSend)
 
 
-    def handleSolvedOne(msg):
+    def handleSolvedOne(self, msg):
         k = int(math.sqrt(len(msg.sudoku)))
         tmpDifficulty = reqDictionary[msg.requestID][0]
 
@@ -83,8 +67,8 @@ class Handler():
         if (tmpDifficulty == "1" and percentCounter < 0.7) or (tmpDifficulty == "2" and percentCounter < 0.5) \
           or (tmpDifficulty == "3" and percentCounter < 0.3):
             #if achieved -> sudoku finished for GUI -> send camel-msg
-            msgToSend = Message(requestID=reqDictionary[msg.requestID][4], senderAddress=senderAddress, instruction="display", sudoku=sudoku)
-            bridge.send(msgToSend)
+            msgToSend = Message(requestID=reqDictionary[msg.requestID][4], senderAddress=self.senderAddress, instruction="display", sudoku=sudoku)
+            self.bridge.send(msgToSend)
             del reqDictionary[msg.requestID]
             return
 
@@ -98,11 +82,11 @@ class Handler():
         reqDictionary[rID] = (difficulty, finishedSudoku, cleanedNumbers, memorySet, firstID)
 
         # send camel-msg to broker (request to solve)
-        msgToSend = Message(requestID=rID, senderAddress=senderAddress, instruction="solve", sudoku=sudoku)
-        bridge.send(msgToSend)
+        msgToSend = Message(requestID=rID, senderAddress=self.senderAddress, instruction="solve", sudoku=sudoku)
+        self.bridge.send(msgToSend)
 
 
-    def handleSolvedMany(msg):
+    def handleSolvedMany(self, msg):
         # recover previous state
         lastNumber = reqDictionary[msg.requestID][2].pop()
         (difficulty, finishedSudoku, oldNumbers, memorySet, firstID) = reqDictionary[msg.requestID]
@@ -124,5 +108,20 @@ class Handler():
         reqDictionary[rID] = (difficulty, finishedSudoku, cleanedNumbers, memorySet, firstID)
 
         # send camel-msg to broker (request to solver)
-        msgToSend = Message(requestID=rID, senderAddress=senderAddress, instruction="solve", sudoku=sudoku)
-        bridge.send(msgToSend)
+        msgToSend = Message(requestID=rID, senderAddress=self.senderAddress, instruction="solve", sudoku=sudoku)
+        self.bridge.send(msgToSend)
+
+
+
+    def handle(self, msg):
+        """
+        Ruft je nach Instruction die entsprechende Handle-Funktion auf
+        """
+        if(msg.instruction.startswith("generate")):
+            self.handleGenerate(msg)
+        elif(msg.instruction == "solved:one"):
+            self.handleSolvedOne(msg)
+        elif(msg.instruction == "solved:many"):
+            self.handleSolvedMany(msg)
+        else:
+            print("Some error occured!")

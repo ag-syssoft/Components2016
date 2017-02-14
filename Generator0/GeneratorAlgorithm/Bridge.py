@@ -5,6 +5,8 @@ from Message import *
 # Versendet Informationen als ZMQ Multipart.
 # zmqPORT ist der Port, auf dem Camel empfaengt
 
+
+
 class Bridge():
 
     def __init__(self, zmqIP="127.0.0.1", zmqPORT = "5555", seperator=';'):
