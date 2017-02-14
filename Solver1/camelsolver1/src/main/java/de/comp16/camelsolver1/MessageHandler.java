@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.apache.camel.EndpointInject;
+import org.apache.camel.ProducerTemplate;
 import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -17,10 +20,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class MessageHandler {
 	
-	public static final String OWN_URI = "http://localhost:8080/rest_api/solve?httpMethodRestrict=POST";
+	public static final String OWN_URI = "http://136.199.51.110:8080/rest_api/solve?httpMethodRestrict=POST";
 	public static final String BROKER_URI = "rabbitmq://136.199.51.111/inExchange?username=kompo&password=kompo&skipQueueDeclare=true";
 	public static final String[] SOLVE_INSTRUCTION= new String[]{"solved:impossible","solved:one","solved:many"};
 	
+	@EndpointInject(uri="direct:out")
+	ProducerTemplate outTemplate;
 	
 	/**
 	 * Processes a received message in the form of a SudokuMessage POJO.
@@ -33,6 +38,10 @@ public class MessageHandler {
 //		System.out.println(in_message.getSender());
 
 		//TODO Validate message
+		
+		String nowAsISO = ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ).replace(':', '-');
+		System.out.println("[sendMessage] Incoming Message (at "+nowAsISO+"):");
+		printMessage(in_message);
 		
 		if (in_message.getInstruction().equals("solve")) {
 			Sudoku toSolve = new Sudoku(in_message.getSudoku());
@@ -71,34 +80,43 @@ public class MessageHandler {
 		}
 	}
 
+	public static SudokuMessage registerAtBroker(boolean registering) {
+		SudokuMessage registerMessage = new SudokuMessage();
+		registerMessage.setRequest_id(java.util.UUID.randomUUID().toString());
+		registerMessage.setSudoku(new int[81]);
+		registerMessage.setInstruction(registering? "register:solver" : "unregister:solver");
+		registerMessage.setSender(OWN_URI);
+		return registerMessage;
+	}
+	
 	public void sendMessage(SudokuMessage out_message) {
 		out_message.setSender(OWN_URI);
-
-
-		//TODO: Send message to broker
 		
-		//TEMP: Ausgabe auf Konsole und in Datei
-		System.out.println("[sendMessage] sending: ");
 		String nowAsISO = ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ).replace(':', '-');
-		
+		System.out.println("[sendMessage] Sending Message (at "+nowAsISO+"):");
+		printMessage(out_message);
+
+		//Send message to broker
+		outTemplate.sendBody(out_message);
+	}
+	
+	/**
+	 * Prints the given SudokuMessage on Console (via Jackson's PrettyPrinter) 
+	 * @param message The message to be printed
+	 */
+	public void printMessage(SudokuMessage message) {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			// Convert object to JSON string and save into a file directly
-			File newdir = new File("var/out_messages");
-			newdir.mkdirs();
-			mapper.writeValue(new File("var/out_messages/message"+nowAsISO+".json"), out_message);
-
 			// Convert object to JSON string and pretty print
-			String jsonInString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(out_message);
+			String jsonInString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(message);
 			System.out.println(jsonInString);
-
 		} catch (JsonGenerationException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
-		
 	}
+	
 }
