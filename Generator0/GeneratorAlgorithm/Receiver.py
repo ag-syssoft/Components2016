@@ -30,7 +30,7 @@ app = Flask(__name__)
 myBridge = None
 myHandler = None
 
-@app.route('/api/message', methods=['POST'])
+@app.route('/api/message_urlencoded', methods=['POST'])
 def receive():
     #print("====================")
     #print("HEADERS:")
@@ -38,8 +38,11 @@ def receive():
     #print("====================")
     #print("RAW:")
     recvRaw = request.stream.read().decode("utf-8")
+    #print(recvRaw)
+    #print("====================")
     recvDecoded = urllib.parse.unquote(recvRaw)
     #print(recvDecoded)
+    #print("====================")
     #print(json.loads(request.stream.read())
     jsonString = recvDecoded.split('}')[0] + "}"
     #print("====================")
@@ -78,11 +81,11 @@ def handleMessage(rawMsg):
         myBridge.send(recvMsg)
         print("PONG")
     elif recvMsg.instruction.startswith("solved"):
-        myHandler.handle(recvMsg)
         print("SOLVED")
-    elif recvMsg.instruction.startswith("generate"):
         myHandler.handle(recvMsg)
+    elif recvMsg.instruction.startswith("generate"):
         print("GENERATE")
+        myHandler.handle(recvMsg)
     else:
         print(recvMsg.instruction)
 
@@ -100,6 +103,7 @@ if __name__ == '__main__':
     myBridge = Bridge()
     myHandler = Handler(getAddress(), myBridge)
     toSend = Message(requestID=uuid.uuid4(), senderAddress=getAddress(), instruction="register:generator", sudoku=[0])
+    #toSend = Message(requestID=uuid.uuid4(), senderAddress="restlet:http://requestb.in/1afbmaf1?restletMethod=post", instruction="register:generator", sudoku=[0])
     myBridge.send(toSend)
     app.run(debug=False,port=80,host='0.0.0.0')
     toSend = Message(requestID=uuid.uuid4(), senderAddress=getAddress(), instruction="unregister:generator", sudoku=[0])

@@ -22,8 +22,9 @@ public class MyRouteBuilder extends RouteBuilder
         
     	from("zeromq:tcp://127.0.0.1:5555?socketType=PULL")		 	
     		.convertBodyTo(String.class) 							// Der Body an sicht ist zunächst vom Typ GenericFile, repräsentiert also noch den urspr File Endpoint.
-	    	.process(py_to_json)									// Konvertieurng, siehe Klasse PyToJsonProcessor
-	    	.log("${body}")											// Print auf die Konsole
+    		.log("Input: ${body}")	
+    		.process(py_to_json)									// Konvertieurng, siehe Klasse PyToJsonProcessor
+	    	.log("Sent:  ${body}")											// Print auf die Konsole
 	    	.to("rabbitmq://136.199.51.111/inExchange?username=kompo&password=kompo&skipQueueDeclare=true");
 
 	    	//.to("file:" + transferFolder + "/output");				// Neue Datei in den Output-Folder
