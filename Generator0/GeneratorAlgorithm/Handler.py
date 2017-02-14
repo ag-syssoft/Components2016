@@ -52,6 +52,9 @@ class Handler():
 
 
     def handleSolvedOne(self, msg):
+        if (not (msg.requestID in reqDictionary)):
+            return
+        
         k = int(math.sqrt(len(msg.sudoku)))
         tmpDifficulty = reqDictionary[msg.requestID][0]
 
@@ -87,6 +90,9 @@ class Handler():
 
 
     def handleSolvedMany(self, msg):
+        if (not (msg.requestID in reqDictionary)):
+            return
+        
         # recover previous state
         lastNumber = reqDictionary[msg.requestID][2].pop()
         (difficulty, finishedSudoku, oldNumbers, memorySet, firstID) = reqDictionary[msg.requestID]
@@ -110,8 +116,6 @@ class Handler():
         # send camel-msg to broker (request to solver)
         msgToSend = Message(requestID=rID, senderAddress=self.senderAddress, instruction="solve", sudoku=sudoku)
         self.bridge.send(msgToSend)
-
-
 
     def handle(self, msg):
         """
