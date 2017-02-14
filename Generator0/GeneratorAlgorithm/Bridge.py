@@ -29,7 +29,13 @@ class Bridge():
         self.disconnect()
 
 if __name__ == "__main__":
-    toSend = Message(requestID="936DA01F-9ABD-4D9D-80C7-02AF85C822A8", senderAddress="restlet:http://requestb.in/11w6aaz1?restletMethod=post", instruction="register:generator", sudoku=[[1,2,3],[4,5,6]])
+    #toSend = Message(requestID="936DA01F-9ABD-4D9D-80C7-02AF85C822A8", senderAddress="zeromq:tcp://136.199.26.133:5554?socketType=PUSH", instruction="register:generator", sudoku=[[1,2,3],[4,5,6]])
     myBridge = Bridge()
+    toSend = Message(requestID="936DA01F-9ABD-4D9D-80C7-02AF85C822A8", senderAddress=getAddress(), instruction="register:generator", sudoku=[[1,2,3],[4,5,6]])
     myBridge.send(toSend)
+    #http://requestb.in/19zcjf91
+    #toSend = Message(requestID="936DA01F-9ABD-4D9D-80C7-02AF85C822A8", senderAddress="restlet:http://requestb.in/19zcjf91?restletMethod=post", instruction="register:generator", sudoku=[[1,2,3],[4,5,6]])
+    #myBridge.send(toSend)
+    #toSend = Message(requestID="936DA01F-9ABD-4D9D-80C7-02AF85C822A8", senderAddress=getAddress(), instruction="unregister:generator", sudoku=[[1,2,3],[4,5,6]])
+    #myBridge.send(toSend)
     myBridge.disconnect()
