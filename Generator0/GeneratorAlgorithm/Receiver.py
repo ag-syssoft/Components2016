@@ -2,6 +2,7 @@
 
 from Message import *
 import json
+import uuid
 from flask import Flask, jsonify, request
 from Bridge import *
 from Handler import Handler
@@ -38,5 +39,9 @@ def parseSudoku(self, sudoku):
 	return toReturn
 	
 if __name__ == '__main__':
+	toSend = Message(requestID=uuid.uuid4(), senderAddress=getAddress(), instruction="register:generator", sudoku=[0])
+    myBridge.send(toSend)
 	app.run(debug=True,port=80,host='0.0.0.0')
+	toSend = Message(requestID=uuid.uuid4(), senderAddress=getAddress(), instruction="unregister:generator", sudoku=[0])
+    myBridge.send(toSend)
     myBridge.disconnect()
