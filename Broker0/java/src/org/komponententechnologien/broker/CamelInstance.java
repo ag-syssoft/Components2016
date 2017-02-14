@@ -48,27 +48,28 @@ public class CamelInstance {
 
         public static void configureRoute(String uri, String id){
                 //If dont have a route with that routingKey (componentID) create it, otherwise delete it
-                if(context.getRoute("route"+id)==null){
+                if(context.getRoute(id)==null){
 
                 try {
                         context.addRoutes(new RouteBuilder() {
                                 @Override
                                 public void configure() throws Exception {
-                                        from(OUTQUEUE+"&routingKey="+id)
-                                        .process(new Processor() {
+                                        from("rabbitmq://136.199.51.111/out?username=kompo&password=kompo&queue="+id+"&skipQueueDeclare=true")
+					.process(new Processor() {
                                          @Override
                                           public void process(Exchange exchange) throws Exception
                                           {
                                            Message toProcess = exchange.getIn().copy();
                                            toProcess.setHeader(Exchange.CONTENT_TYPE, MediaType.APPLICATION_JSON);
                                            byte[] body = (byte[])toProcess.getBody();
-                                           System.out.println("Sent message: "+new String(body));
+					   toProcess.setHeader(Exchange.CONTENT_LENGTH,body.length);
+                                           System.out.println("Sent message ("+uri+"): "+new String(body));
                                            exchange.setOut(toProcess);
 
                                           }
 
                                         })
-                                        .to(uri).id(id);
+					.id(id).to(uri);
                                         System.out.println("Added route from RoutingKey "+id+" to "+uri);
                                 }
                         });
@@ -79,8 +80,8 @@ public class CamelInstance {
                 else{
                         try{
                                 System.out.println("Starting to delete route "+id);
-                                context.stopRoute("route"+id);
-                                context.removeRoute("route"+id);
+                                context.stopRoute(id);
+                                context.removeRoute(id);
                                 System.out.println("Removed route with id "+id);
 
                         }catch (Exception e) {

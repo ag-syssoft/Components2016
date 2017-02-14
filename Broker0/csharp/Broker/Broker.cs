@@ -115,6 +115,7 @@ namespace Broker
         /// <param name="c">Component to add</param>
         public void configureRoute(Component c)
         {
+		Console.WriteLine("Adding RabbitMQ Queue");
 			//Add queue
 			rqModel.QueueDeclare(c.id.ToString(), false, false, false, null);
 			//add binding to outexchange
