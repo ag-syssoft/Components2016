@@ -1,10 +1,17 @@
+import uuid
+import socket
 from flask import jsonify
+
+def getAdress(ipAddressPort=""):
+	if (ipAdressPort==""):
+		ipAdressPort = socket.gethostbyname(socket.gethostname())
+	return "restlet:http://" + ipAdressPort + "/api/message?restletMethod=post"
 
 class Message():
 
-	def __init__ (self, requestID="-1", sender="Solver42", instruction="solve", sudoku="[[]]"):
+	def __init__ (self, requestID="-1", senderAddress="", instruction="solve", sudoku="[[]]"):
 		self.requestID   = requestID
-		self.sender      = sender
+		self.sender      = senderAddress
 		self.instruction = instruction
 		self.sudoku      = sudoku
 
@@ -16,3 +23,6 @@ class Message():
 				'sudoku': self.sudoku,
 				}
 		return jsonify({'message': message})
+
+	def createGUID():
+		return uuid.uuid1()

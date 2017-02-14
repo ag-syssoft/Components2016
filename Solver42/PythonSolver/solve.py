@@ -1,5 +1,5 @@
 # Recursive backtracking SUDOKU<gasp> solver
-# (c) Jesko Hüttenhain
+# (c) Jesko HÃ¼ttenhain
 # Published under YouMayOnlyStareAndMarvelInAwePL
 def echo(S):
     for i in range(9):
