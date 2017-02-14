@@ -115,6 +115,10 @@ namespace Broker
         /// <param name="c">Component to add</param>
         public void configureRoute(Component c)
         {
+			//Add queue
+			rqModel.QueueDeclare(c.id.ToString(), false, false, false, null);
+			//add binding to outexchange
+			rqModel.QueueBind(c.id.ToString(), "outExchange", c.id.ToString(), null);
             //Sends a new route configuration to camel instance
             byte[] body = System.Text.Encoding.Default.GetBytes(c.uri);
             rqModel.BasicPublish(CONFIG, c.id.ToString(), false, rqPPersistent, body);
@@ -145,6 +149,8 @@ namespace Broker
             Component c = registered.Find(x => x.uri.Equals(uri));
             if (c == null) return false;
             configureRoute(c);
+			rqModel.QueueUnbind(c.id.ToString(), "outExchange", c.id.ToString(), null);
+			rqModel.QueueDelete(c.id.ToString(), false, false);
             return registered.Remove(c);
         }
 
@@ -198,6 +204,7 @@ namespace Broker
             Component c = registered.Find(x => (x.uri == m.sender));
             if (c == null) return;
             sendMessage(m,c);
+			Console.WriteLine("Wrote pong to " + c.uri);
         }
 
         public Component sendMessage(Message m, Component.Type recipientType)
