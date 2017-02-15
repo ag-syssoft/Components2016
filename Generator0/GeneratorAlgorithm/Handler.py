@@ -36,8 +36,18 @@ class Handler():
     def getDictionary():
         return reqDictionary
 
+
+    def checkValid(sudoku):
+        return ((math.sqrt(len(sudoku))) % 1) == 0
+
+
     def handleGenerate(self, msg):
         print("start handleGenerate..")
+
+        if (not(checkValid(msg.sudoku))):
+            print("length of sudoku not valid ~> stopping handleGenerate..")
+            return
+
         k = int(math.sqrt(len(msg.sudoku)))
         difficulty = msg.instruction[-1:]
         sudoku = generateFilledSudoku(k)

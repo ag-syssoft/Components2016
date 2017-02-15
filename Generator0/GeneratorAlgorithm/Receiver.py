@@ -16,15 +16,17 @@ def msgPrinter (message):
     print(message.sudoku)
     print()
 
-def parseSudoku(self, sudoku):
-	# Nimmt Sudoku-Flat-Array entgegen und gibt verschachteltes Array aus
-	# Fehlt: Exception Handling bei falscher Sudoku-länge
-	parts = int(math.sqrt(len(sudoku)))
-	toReturn = [[]] * parts
-	for iA in range (parts):
-		for iB in range (parts):
-			toReturn[iA] += [sudoku[parts*iA+iB]]
-	return toReturn
+def parseSudoku(sudoku):
+    # Nimmt Sudoku-Flat-Array entgegen und gibt verschachteltes Array aus
+    # Fehlt: Exception Handling bei falscher Sudoku-länge
+    sudokuSize = int(math.sqrt(len(sudoku)))
+    toReturn = [[0]] * sudokuSize
+    for i in range(0,sudokuSize):
+        tmp = [0]*sudokuSize
+        for j in range(0,sudokuSize):
+            tmp[j] = sudoku[i*sudokuSize+j]
+        toReturn[i] = tmp
+    return toReturn
 
 app = Flask(__name__)
 myBridge = None
@@ -74,7 +76,7 @@ def receive():
 
 def handleMessage(rawMsg):
     recvJson = json.loads(rawMsg)
-    recvMsg = Message(requestID=recvJson["request-id"], senderAddress=recvJson["sender"], instruction=recvJson["instruction"], sudoku=recvJson["sudoku"])
+    recvMsg = Message(requestID=recvJson["request-id"], senderAddress=recvJson["sender"], instruction=recvJson["instruction"], sudoku=parseSudoku(recvJson["sudoku"]))
     if recvMsg.instruction == "ping":
         print("PING")
         recvMsg.instruction = "pong"
@@ -85,6 +87,7 @@ def handleMessage(rawMsg):
         myHandler.handle(recvMsg)
     elif recvMsg.instruction.startswith("generate"):
         print("GENERATE")
+
         myHandler.handle(recvMsg)
     else:
         print(recvMsg.instruction)

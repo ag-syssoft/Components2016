@@ -10,14 +10,17 @@ from Handler import *
 input = [1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,]
 
 def parseSudoku(sudoku):
-	# Nimmt Sudoku-Flat-Array entgegen und gibt verschachteltes Array aus
-	# Fehlt: Exception Handling bei falscher Sudoku-länge
-	parts = int(math.sqrt(len(sudoku)))
-	toReturn = [[0]] * parts
-	for iA in range (parts):
-		for iB in range (parts):
-			toReturn[iA] += [sudoku[parts*iA+iB]]
-	return toReturn
+    # Nimmt Sudoku-Flat-Array entgegen und gibt verschachteltes Array aus
+    # Fehlt: Exception Handling bei falscher Sudoku-länge
+    sudokuSize = int(math.sqrt(len(sudoku)))
+    toReturn = [[0]] * sudokuSize
+
+    for i in range(0,sudokuSize):
+        tmp = [0]*sudokuSize
+        for j in range(0,sudokuSize):
+            tmp[j] = sudoku[i*sudokuSize+j]
+        toReturn[i] = tmp
+    return toReturn
 
 out = parseSudoku(input)
 
