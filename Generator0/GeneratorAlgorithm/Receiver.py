@@ -18,7 +18,7 @@ def msgPrinter (message):
 
 def parseSudoku(self, sudoku):
 	# Nimmt Sudoku-Flat-Array entgegen und gibt verschachteltes Array aus
-	# Fehlt: Excetion Handling bei falscher Sudko länge
+	# Fehlt: Exception Handling bei falscher Sudoku-länge
 	parts = int(math.sqrt(len(sudoku)))
 	toReturn = [[]] * parts
 	for iA in range (parts):
@@ -89,15 +89,6 @@ def handleMessage(rawMsg):
     else:
         print(recvMsg.instruction)
 
-def parseSudoku(self, sudoku):
-	# Nimmt Sudoku-Flat-Array entgegen und gibt verschachteltes Array aus
-	# Fehlt: Excetion Handling bei falscher Sudko länge
-	parts = int(math.sqrt(len(sudoku)))
-	toReturn = [[]] * parts
-	for iA in range (parts):
-		for iB in range (parts):
-			toReturn[iA] += [sudoku[parts*iA+iB]]
-	return toReturn
 
 if __name__ == '__main__':
     myBridge = Bridge()

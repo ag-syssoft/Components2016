@@ -2,10 +2,28 @@ from SudokuGenerator import *
 from Message import *
 from Handler import *
 
-sudoku = generateInitialSudoku(k=3)
+#sudoku = generateInitialSudoku(k=3)
 
 #sudoku, list = emptyField(sudoku,17)
-print(formattedString(sudoku))
+#print(formattedString(sudoku))
+
+input = [1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,]
+
+def parseSudoku(sudoku):
+	# Nimmt Sudoku-Flat-Array entgegen und gibt verschachteltes Array aus
+	# Fehlt: Exception Handling bei falscher Sudoku-länge
+	parts = int(math.sqrt(len(sudoku)))
+	toReturn = [[0]] * parts
+	for iA in range (parts):
+		for iB in range (parts):
+			toReturn[iA] += [sudoku[parts*iA+iB]]
+	return toReturn
+
+out = parseSudoku(input)
+
+print(out)
+
+
 #print(sudoku)
 
 #senderAddress = "127.0.0.1"
