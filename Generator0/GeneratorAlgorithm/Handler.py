@@ -70,7 +70,7 @@ class Handler():
             print("unknown requestID...\nbreak")
             return
 
-        k = int(math.sqrt(len(msg.sudoku)))
+        k = int(len(msg.sudoku))
         tmpDifficulty = reqDictionary[msg.requestID][0]
 
         # get number of 'empty' fields
