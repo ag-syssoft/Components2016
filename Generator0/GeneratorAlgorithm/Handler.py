@@ -61,6 +61,7 @@ class Handler():
         # send message to camel
         msgToSend = Message(requestID=rID, senderAddress=self.senderAddress, instruction="solve", sudoku=sudoku)
         print("Send generated stuff")
+        print(rID)
         self.bridge.send(msgToSend)
 
 
@@ -68,6 +69,9 @@ class Handler():
         print("start handleSolvedOne..")
         if (not (msg.requestID in reqDictionary)):
             print("unknown requestID...\nbreak")
+            print(msg.requestID)
+            print("Dict:")
+            print(reqDictionary)
             return
 
         k = int(len(msg.sudoku))
@@ -80,6 +84,8 @@ class Handler():
                 if elem == 0:
                     emptyCounter = emptyCounter + 1
         percentCounter = (emptyCounter) / (k*k)
+        print(percentCounter)
+
         sudoku = msg.sudoku
 
         # check if we are done or if need still need to 'empty' fields (difficulty)
@@ -114,6 +120,8 @@ class Handler():
             print("unknown requestID..\nbreak")
             return
 
+
+        print(reqDictionary[msg.requestID])
         # recover previous state
         print("recover previous state..")
         lastNumber = reqDictionary[msg.requestID][2].pop()
