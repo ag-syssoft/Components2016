@@ -18,6 +18,8 @@ public class MyRouteBuilder extends RouteBuilder {
      */
     public void configure() {
 
+	getContext().setTracing(true);
+
         // Reading files from src/data, binding JSON to SudokuMessage-POJO
         from("file:src/data?noop=true")
         	.log("Got file: ${body}")
@@ -25,7 +27,7 @@ public class MyRouteBuilder extends RouteBuilder {
         	.to("direct:handle");
         
         
-        restConfiguration().component("undertow")
+        restConfiguration().component("restlet")
 	        // use json binding mode so Camel automatic binds json <--> pojo
 	        .bindingMode(RestBindingMode.json)
 	        // set jackson properties
@@ -37,7 +39,9 @@ public class MyRouteBuilder extends RouteBuilder {
         
         // Receiving messages via REST
         rest("/rest_api")
-	        .post("/solve").consumes("application/json").type(SudokuMessage.class).to("direct:handle");
+	        .post("/solve").consumes("application/json")
+		.to("file:var/in_messages")
+		.type(SudokuMessage.class).to("direct:handle");
 
         // Passing SudokuMessage to new MessageHandler
 	    from("direct:handle")
