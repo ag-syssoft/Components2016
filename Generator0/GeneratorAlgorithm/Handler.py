@@ -55,7 +55,7 @@ class Handler():
         # initial cleanup (remove 8 numbers)
         print("initial cleanup (remove 8 numbers)..")
         sudoku, cleanedNumbers = emptyField(sudoku,8)
-        rID = Message.createGUID()
+        rID = Message.createGUID().urn[9:]
         reqDictionary[rID] = (difficulty, sudoku, cleanedNumbers, (set()), msg.requestID)
 
         # send message to camel
@@ -99,7 +99,7 @@ class Handler():
         (difficulty, finishedSudoku, oldNumbers, memorySet, firstID) = reqDictionary[msg.requestID]
         del reqDictionary[msg.requestID]
         cleanedNumbers = oldNumbers + cleanedNumbers
-        rID = Message.createGUID()
+        rID = Message.createGUID().urn[9:]
         reqDictionary[rID] = (difficulty, finishedSudoku, cleanedNumbers, memorySet, firstID)
 
         # send camel-msg to broker (request to solve)
@@ -134,7 +134,7 @@ class Handler():
         sudoku, cleanedNumbers = emptyField(sudoku,1)
         memorySet = memorySet.add(cleanedNumbers[0])
         cleanedNumbers = oldNumbers + cleanedNumbers
-        rID = Message.createGUID()
+        rID = Message.createGUID().urn[9:]
         reqDictionary[rID] = (difficulty, finishedSudoku, cleanedNumbers, memorySet, firstID)
 
         # send camel-msg to broker (request to solver)
