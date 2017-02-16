@@ -37,14 +37,14 @@ class Handler():
         return reqDictionary
 
 
-    def checkValid(sudoku):
+    def checkValid(self, sudoku):
         return ((math.sqrt(len(sudoku))) % 1) == 0
 
 
     def handleGenerate(self, msg):
         print("start handleGenerate..")
 
-        if (not(checkValid(msg.sudoku))):
+        if (not(self.checkValid(msg.sudoku))):
             print("length of sudoku not valid ~> stopping handleGenerate..")
             return
 
