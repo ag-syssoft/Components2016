@@ -70,7 +70,7 @@ def swapBlocks(sudoku):
     while(block1 == block2):
         block2 = random.randint(0,k-1)
 
-    for i in range(0,k-1):
+    for i in range(0,k):
         sudoku[block1*k+i], sudoku[block2*k+i] = sudoku[block2*k+i], sudoku[block1*k+i]
 
     return sudoku

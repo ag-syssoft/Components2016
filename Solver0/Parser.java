@@ -1,4 +1,4 @@
-package comp.solver;
+package SolverGID.SolverAID;
 
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
@@ -7,134 +7,141 @@ import org.json.simple.parser.ParseException;
 
 public class Parser {
 
-    static String sender = "";
+	static String sender = "";
 
-    public static String parse(String input) {
+	public static String parse(String input) {
 
-        /* Test fuer korrekten Empfang / Debug */
-        //System.out.println("Input:\n" + input);
+		/* Test fuer korrekten Empfang */
+		MainApp.logger.warning("Input:\n" + input);
 
-        /* Dokument ueberpruefen. Erst einfache Ueberpruefung */
-        String request = "";
-        // Sender also Absender wird nur bei der direkten Kommunikation benötigt
-        //String sender = "";
-        String instruction = "";
+		/* Dokument ueberpruefen. Erst einfache Ueberpruefung */
+		String request = "";
+		// String sender = "";
+		String instruction = "";
 
-        int[] sudoku = {};
+		int[] sudoku = {};
 
-        // Hier ggf. noch ueberarbeiten
-        String modInput = input.replace("|", "").replace(" ", "").replace("\r", "").replace("\n", "").replace("\t", "");
+		String modInput = input.replace("|", "").replace(" ", "").replace("\r", "").replace("\n", "").replace("\t", "");
 
-        JSONParser parser = new JSONParser();
+		JSONParser parser = new JSONParser();
+System.out.println("11");
+		try {
+			System.out.println("22");
+			Object object = parser.parse(modInput);
 
-        try {
+			JSONObject myJSONObject = (JSONObject) object;
+			request = (String) myJSONObject.get(MainApp.REQUEST_ID);
+			// sender = (String) myJSONObject.get("sender");
+			System.out.println("33");
+			instruction = (String) myJSONObject.get(MainApp.INSTRUCTION);
+			if (myJSONObject.containsKey(MainApp.SUDOKU)) {
+				JSONArray sudokuArray = (JSONArray) myJSONObject.get(MainApp.SUDOKU);
+				sudoku = new int[sudokuArray.size()];
+				for (int i = 0; i < sudokuArray.size(); i++) {
+					sudoku[i] = Integer.valueOf(String.valueOf((sudokuArray.get(i))));
+				}
+			} else {
+				MainApp.logger.info("noSudoku!");
+				return answerJSON(request, "solved:illegal", sudoku);
+			}
 
-            Object object = parser.parse(modInput);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 
-            JSONObject myJSONObject = (JSONObject) object;
+		// Debug
+		// MainApp.logger.info("Input:");
+		// MainApp.logger.info("request=" + request);
+		// MainApp.logger.info("sender=" + sender);
+		// MainApp.logger.info("instruction=" + instruction);
+		// MainApp.logger.info("sudoku=" + Arrays.toString(sudoku));
 
-            request = (String) myJSONObject.get("request-id");
+		switch (instruction) {
+		case "ping":
+			// Antworte mit pong
+			return answerJSON(request, "pong", sudoku);
 
-            //sender = (String) myJSONObject.get("sender");
+		case "pong":
+			MainApp.logger.fine("Message Ignored: " + instruction);
+			if (request.equals(Pinger.lastID.toString())) {
+				Pinger.pingReturned = true;
+				Pinger.lastID = "";
+			}
+			return "ERROR";
+		case "solve":
+			try {
+				SudokuSolver sodokuSolver = new SudokuSolver(sudoku);
+				int solution = sodokuSolver.search();
+				if (solution == 0) {
+					return answerJSON(request, "solved:impossible", sudoku);
+				} else if (solution == 1) {
+					return answerJSON(request, "solved:one", sudoku);
+				} else if (solution == 2) {
+					return answerJSON(request, "solved:many", sudoku);
+				}
+			} catch (Exception e) {
+				MainApp.logger.info(e.toString());
+				e.printStackTrace();
+				return answerJSON(request, "solved:illegal", sudoku);
+			}
 
-            instruction = (String) myJSONObject.get("instruction");
+		default:
+			MainApp.logger.fine("Message Ignored: " + instruction);
+			// Rest interessiert uns nicht
+			return "ERROR";
+		}
+	}
 
-            if (myJSONObject.containsKey("sudoku")) {
-                JSONArray sudokuArray = (JSONArray) myJSONObject.get("sudoku");
-                sudoku = new int[sudokuArray.size()];
-                for (int i = 0; i < sudokuArray.size(); i++) {
-                    sudoku[i] = Integer.valueOf(String.valueOf((sudokuArray.get(i))));
-                }
-            }
-        } catch (ParseException e) {
-            return "ERROR";
-            //e.printStackTrace();
-        }
+	public static String answerJSON(String request, String instruction, int[] sudoku) {
+		/*
+		 * Sender muss geupdated werden für Antwort (URI muss noch gemachr
+		 * werden..). Instruction wurde bereits geupdated. GUID (request-id)
+		 * bleibt (?). Sudoku Feld ist entweder null oder bereits durch
+		 * Solve-Case geupdatet.
+		 */
 
-        // Debug
-//        System.out.println("Output:");
-//        System.out.println("request=" + request);
-//        System.out.println("sender=" + sender);
-//        System.out.println("instruction=" + instruction);
-//        System.out.println("sudoku=" + Arrays.toString(sudoku));
+		String answer = "";
 
-        switch (instruction) {
-            case "ping":
-                //Antworte mit pong
-                return answerJSON(request, "pong", sudoku);
+		if (sender.isEmpty()) {
+			System.err.println("Bitte zuerst die SenderURI über Setter-Methode festlegen!");
 
-            case "solve":
-                try {
-                    SudokuSolver sodokuSolver = new SudokuSolver(sudoku);
-                    int solution = sodokuSolver.search();
-                    if (solution == 0) {
-                        return answerJSON(request, "solved:impossible", sudoku);
-                    } else if (solution == 1) {
-                        return answerJSON(request, "solved:one", sudoku);
-                    } else if (solution == 2) {
-                        return answerJSON(request, "solved:many", sudoku);
-                    }
-                } catch (Exception e) {
-                    return "ERROR";
-                    //e.printStackTrace();
-                }
+		} else {
+			// MainApp.logger.info(sender);
+			JSONObject object = new JSONObject();
+			object.put(MainApp.REQUEST_ID, request);
+			object.put(MainApp.SENDER, sender);
+			object.put(MainApp.INSTRUCTION, instruction);
 
-            default:
-                //Rest interessiert uns nicht
-                return "ERROR";
-        }
-    }
+			if (sudoku.length != 0) {
+				JSONArray sudokuArray = new JSONArray();
+				for (int i = 0; i < sudoku.length; i++) {
+					sudokuArray.add(sudoku[i]);
+				}
+				object.put(MainApp.SUDOKU, sudokuArray);
+			}
 
-    public static String answerJSON(String request, String instruction, int[] sudoku) {
-        /*
-         * Sender muss geupdated werden für Antwort (URI muss noch gemachr werden..). Instruction wurde bereits geupdated.
-         *  GUID (request-id) bleibt (?).
-         * Sudoku Feld ist entweder null oder bereits durch Solve-Case geupdatet.
-          */
+			answer = object.toJSONString();
 
-        String answer = "";
+			// Debug
+			// MainApp.logger.info("Answer:");
+			// MainApp.logger.info(answer);
+		}
+		String answer2 = answer.replace("\\", "");
+		MainApp.logger.severe("Output: " + answer2);
+		return answer2;
 
-        if (sender.isEmpty()) {
-            System.err.println("Bitte zuerst die SenderURI über Setter-Methode festlegen!");
+	}
 
-        } else {
-            JSONObject object = new JSONObject();
-            object.put("request-id", request);
-            object.put("sender", sender);
-            object.put("instruction", instruction);
+	public static void setSender(String senderURI) {
+		if (senderURI.isEmpty()) {
+			System.err.println("Der als Parameter übergebene String ist leer!");
+		} else {
+			sender = senderURI;
+		}
+	}
 
-            if (sudoku.length != 0) {
-                JSONArray sudokuArray = new JSONArray();
-                for (int i = 0; i < sudoku.length; i++) {
-                    sudokuArray.add(sudoku[i]);
-                }
-                object.put("sudoku", sudokuArray);
-            }
-
-            answer = object.toJSONString();
-
-            // Debug
-//            System.out.println("Answer:");
-//            System.out.println(answer);
-        }
-        return answer;
-
-    }
-
-
-    public static void setSender(String senderURI) {
-        if (senderURI.isEmpty()) {
-            System.err.println("Der als Parameter übergebene String ist leer!");
-        } else {
-            sender = senderURI;
-        }
-    }
-
-    public static String getSender() {
-        return sender;
-    }
+	public static String getSender() {
+		return sender;
+	}
 
 }
-
-
-

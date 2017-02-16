@@ -5,11 +5,13 @@ from flask import jsonify
 def getAddress(ipAddressPort=""):
 	if (ipAddressPort==""):
 		ipAddressPort = socket.gethostbyname(socket.gethostname())
-	return "restlet:http://" + ipAddressPort + "/api/message?restletMethod=post"
+	return "restlet:http://" + ipAddressPort + "/api/message_urlencoded?restletMethod=post"
 
 class Message():
 
 	def __init__ (self, requestID="-1", senderAddress="", instruction="solve", sudoku="[[]]"):
+		if requestID == "-1":
+			self.requestID   = uuid.uuid4()
 		self.requestID   = requestID
 		self.sender      = senderAddress
 		self.instruction = instruction
