@@ -5,7 +5,7 @@ from flask import jsonify
 def getAddress(ipAddressPort=""):
 	if (ipAddressPort==""):
 		ipAddressPort = socket.gethostbyname(socket.gethostname())
-	return "restlet:http://" + ipAddressPort + "/api/message?restletMethod=post"
+	return "restlet:http://" + ipAddressPort + "/api/message_urlencoded?restletMethod=post"
 
 class Message():
 
