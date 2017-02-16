@@ -79,12 +79,12 @@ class Handler():
             for elem in row:
                 if elem == 0:
                     emptyCounter = emptyCounter + 1
-        percentCounter = (emptyCounter * 100) / (k*k)
+        percentCounter = (emptyCounter) / (k*k)
 
         # check if we are done or if need still need to 'empty' fields (difficulty)
         print("check if we are done or if need still need to 'empty' fields..")
-        if (tmpDifficulty == "1" and percentCounter < 0.7) or (tmpDifficulty == "2" and percentCounter < 0.5) \
-          or (tmpDifficulty == "3" and percentCounter < 0.3):
+        if (tmpDifficulty == "1" and percentCounter > 0.3) or (tmpDifficulty == "2" and percentCounter > 0.5) \
+          or (tmpDifficulty == "3" and percentCounter > 0.7):
             #if achieved -> sudoku finished for GUI -> send camel-msg
             msgToSend = Message(requestID=reqDictionary[msg.requestID][4], senderAddress=self.senderAddress, instruction="display", sudoku=sudoku)
             self.bridge.send(msgToSend)
