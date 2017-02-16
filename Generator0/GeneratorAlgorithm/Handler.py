@@ -48,13 +48,21 @@ class Handler():
             print("length of sudoku not valid ~> stopping handleGenerate..")
             return
 
+        if (len(msg.sudoku) == 1):
+            msgToSend = Message(requestID=msg.requestID, senderAddress=self.senderAddress, instruction="display", sudoku=[[0]])
+            self.bridge.send(msgToSend)
+            print("done.. sudokuSize = 1..")
+            return
+
         k = int(math.sqrt(len(msg.sudoku)))
+        print("1")
         difficulty = msg.instruction[-1:]
         sudoku = generateFilledSudoku(k)
+        print("2")
 
         # initial cleanup (remove 8 numbers)
-        print("initial cleanup (remove 8 numbers)..")
-        sudoku, cleanedNumbers = emptyField(sudoku,8)
+        print("initial cleanup (remove k*k/10 numbers)..")
+        sudoku, cleanedNumbers = emptyField(sudoku,int(k*k/10))
         rID = Message.createGUID().urn[9:]
         reqDictionary[rID] = (difficulty, sudoku, cleanedNumbers, (set()), msg.requestID)
 
@@ -81,6 +89,7 @@ class Handler():
                     emptyCounter = emptyCounter + 1
         percentCounter = (emptyCounter) / (k*k)
         sudoku = msg.sudoku
+        print(percentCounter)
 
         # check if we are done or if need still need to 'empty' fields (difficulty)
         print("check if we are done or if need still need to 'empty' fields..")
@@ -139,7 +148,7 @@ class Handler():
 
         # send camel-msg to broker (request to solver)
         msgToSend = Message(requestID=rID, senderAddress=self.senderAddress, instruction="solve", sudoku=sudoku)
-        print("send generated stuff..")
+        print("send solvedMany stuff..")
         self.bridge.send(msgToSend)
 
 
