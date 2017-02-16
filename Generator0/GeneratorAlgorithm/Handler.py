@@ -132,7 +132,7 @@ class Handler():
         # remove numbers and check if already removed
         print("remove numbers and check if already removed..")
         sudoku, cleanedNumbers = emptyField(sudoku,1)
-        memorySet = memorySet.add(cleanedNumbers[0])
+        memorySet.add(cleanedNumbers[0])
         cleanedNumbers = oldNumbers + cleanedNumbers
         rID = Message.createGUID().urn[9:]
         reqDictionary[rID] = (difficulty, finishedSudoku, cleanedNumbers, memorySet, firstID)
