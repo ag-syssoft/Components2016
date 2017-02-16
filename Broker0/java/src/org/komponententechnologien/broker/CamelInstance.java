@@ -54,7 +54,14 @@ public class CamelInstance {
                         context.addRoutes(new RouteBuilder() {
                                 @Override
                                 public void configure() throws Exception {
-                                        from("rabbitmq://136.199.51.111/out?username=kompo&password=kompo&queue="+id+"&skipQueueDeclare=true")
+                                        
+					if(uri.contains("urlencode")){
+						from("rabbitmq://136.199.51.111/out?username=kompo&password=kompo&queue="+id+"&skipQueueDeclare=true")
+						.id(id).to(uri);
+					}else{
+
+
+					from("rabbitmq://136.199.51.111/out?username=kompo&password=kompo&queue="+id+"&skipQueueDeclare=true")
 					.process(new Processor() {
                                          @Override
                                           public void process(Exchange exchange) throws Exception
@@ -70,6 +77,7 @@ public class CamelInstance {
 
                                         })
 					.id(id).to(uri);
+					}
                                         System.out.println("Added route from RoutingKey "+id+" to "+uri);
                                 }
                         });
