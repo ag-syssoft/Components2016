@@ -80,6 +80,7 @@ class Handler():
                 if elem == 0:
                     emptyCounter = emptyCounter + 1
         percentCounter = (emptyCounter) / (k*k)
+        sudoku = msg.sudoku
 
         # check if we are done or if need still need to 'empty' fields (difficulty)
         print("check if we are done or if need still need to 'empty' fields..")
@@ -94,7 +95,6 @@ class Handler():
 
         # remove numbers
         print("remove numbers..")
-        sudoku = msg.sudoku
         sudoku, cleanedNumbers = emptyField(sudoku,1)
         (difficulty, finishedSudoku, oldNumbers, memorySet, firstID) = reqDictionary[msg.requestID]
         del reqDictionary[msg.requestID]
