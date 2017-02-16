@@ -1,0 +1,7 @@
+java:
+  container_name: broker_java
+  restart: unless-stopped
+  build: .
+
+
+  

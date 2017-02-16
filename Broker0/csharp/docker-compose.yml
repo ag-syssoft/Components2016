@@ -1,0 +1,7 @@
+csharp:
+  container_name: broker_csharp
+  restart: unless-stopped
+  build: .
+
+
+  
