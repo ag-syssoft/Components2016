@@ -153,5 +153,7 @@ class Handler():
             self.handleSolvedOne(msg)
         elif(msg.instruction == "solved:many"):
             self.handleSolvedMany(msg)
+        elif(msg.instruction == "solved:impossible"):
+            print("Impossible Sudoku")
         else:
             print("Some error occured!")
