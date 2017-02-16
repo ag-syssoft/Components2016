@@ -1,5 +1,6 @@
 import zmq
 from Message import *
+from SudokuGenerator import *
 
 # Message(requestID, instruction, sudoku) und uebergeben
 # Versendet Informationen als ZMQ Multipart.
@@ -18,6 +19,8 @@ class Bridge():
 
     def send(self, message):
         toSend = str(message.requestID) + self.seperator + message.sender + self.seperator + message.instruction + self.seperator + str(message.sudoku)
+        for i in message.sudoku:
+            print(i)
         self.zmqSocket.send(bytes(toSend, 'utf-8'))
 
     def disconnect (self):
