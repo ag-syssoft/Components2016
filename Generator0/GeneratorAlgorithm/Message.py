@@ -10,6 +10,8 @@ def getAddress(ipAddressPort=""):
 class Message():
 
 	def __init__ (self, requestID="-1", senderAddress="", instruction="solve", sudoku="[[]]"):
+		if requestID == "-1":
+			self.requestID   = uuid.uuid4()
 		self.requestID   = requestID
 		self.sender      = senderAddress
 		self.instruction = instruction
