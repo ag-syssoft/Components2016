@@ -49,8 +49,6 @@ public class MainApp {
 		URI uri = URI.loadURI();
 		System.out.println("uri " + uri.in);
         System.out.println("uri " + uri.out);
-        URI uri1 = new URI("imap://we4c5.netcup.net?consumer.delay=5000&consumer.useFixedDelay=true&delete=true&password=komboenten&searchTerm.subject=Solver&searchTerm.unseen=true&sortTerm=arrival&username=web731p5","smtp://we4c5.netcup.net?username=web731p5&password=komboenten&subject=Solver&to=solver0@thommes.net&from=Broker0");
-        uri1.saveURI();
 		solver0URIin = uri.in;
 		solver0URIout = uri.out;
 		logger.fine(uri.in);
