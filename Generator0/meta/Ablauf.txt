@@ -1,0 +1,26 @@
+title  Ablauf
+
+participant GUI
+participant Generator
+participant Solver
+
+GUI -> Generator: [rID1, gui, generate:diff, sudoku]
+Generator -> Solver: [rID, generator, solve, sudoku]
+
+
+loop sudoku.status == finished
+    Solver -> Generator: [rID, solver, instruction, sudoku]
+
+    alt instruction == solvedOne
+        note over Generator: remove a number and save number in dictionary
+        Generator -> Solver: [rID, generator, solve, sudoku]
+    else instruction == solvedMany
+        note over Generator: search last number in dictionary
+        note over Generator: return last number and remove a different one
+        Generator -> Solver: [rID, generator, solve, sudoku]
+    else instruction == solvedImpossible
+        note over Generator: throw Exception
+    end
+end
+
+Generator ->GUI: [rID1, generator, display, sudoku]
