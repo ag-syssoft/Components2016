@@ -1,5 +1,3 @@
-package SolverGID.SolverAID;
-
 import java.util.UUID;
 
 import org.apache.camel.ProducerTemplate;
@@ -10,6 +8,7 @@ import org.json.simple.JSONObject;
 public class RegisterThread extends Thread {
 	Main main;
 	boolean register;
+	static String registerUID;
 
 	RegisterThread(Main main) {
 		this.main = main;
@@ -24,14 +23,18 @@ public class RegisterThread extends Thread {
 	@Override
 	public void run() {
 		if (register) {
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			MainApp.logger.fine("MainStatus: " + main.getStatus());
+			while (!main.isStarted()) {
+				try {
+					System.out.println("Camel not started, 5 s sleep");
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
-		MainApp.logger.info("Register Run");
+		MainApp.logger.info("Camel is Started - Register Run");
 		ProducerTemplate template;
 		try {
 			template = main.getCamelTemplate();
@@ -50,9 +53,9 @@ public class RegisterThread extends Thread {
 	public static String register() {
 		UUID id = UUID.randomUUID();
 		JSONObject object = new JSONObject();
+		registerUID = id.toString();
 		object.put(MainApp.REQUEST_ID, id.toString());
-		object.put(MainApp.SENDER,
-				MainApp.solver0URI);
+		object.put(MainApp.SENDER, MainApp.solver0URIout);
 		object.put(MainApp.INSTRUCTION, "register:solver");
 		JSONArray sudokuArray = new JSONArray();
 		sudokuArray.add(0);
@@ -68,8 +71,7 @@ public class RegisterThread extends Thread {
 		UUID id = UUID.randomUUID();
 		JSONObject object = new JSONObject();
 		object.put(MainApp.REQUEST_ID, id.toString());
-		object.put(MainApp.SENDER,
-				MainApp.solver0URI);
+		object.put(MainApp.SENDER, MainApp.solver0URIout);
 		object.put(MainApp.INSTRUCTION, "unregister");
 		JSONArray sudokuArray = new JSONArray();
 		sudokuArray.add(0);
