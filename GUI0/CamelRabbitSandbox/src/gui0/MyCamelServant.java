@@ -23,7 +23,7 @@ public class MyCamelServant {
 	//final static String broker_in = "irc:MyConsumer@irc.freenode.net/#MyCamelTest&nickname=MyConsumer";
 	final static String broker_in = "irc:MyConsumer@136.199.53.49:6667/#MyCamelTest&nickname=MyConsumer";
 	final static String dummy_out = "stream:out";
-	
+
 	static String my_sender;
 
 	public static void main(String[] args) {
@@ -50,48 +50,48 @@ public class MyCamelServant {
 							System.out.println("uncompressed string received: >" + str_uncompressed.trim() + "<");
 
 							// processing
-														
+
 							// generate message object out of the str_uncompressed string from js
-							
+
 							MyMessage msg = new MyMessage();
 							msg.generateDummy(1);
 							//msg.setSender("irc:MyJames@irc.freenode.net/#MyCamelTest&nickname=MyJames");
 							msg.setSender("irc:MyJames@136.199.53.49:6667/#MyCamelTest&nickname=MyJames");
-							
+
 							switch(str_uncompressed.trim().split(":")[0]) {
-							
+
 							case "register":
-								
+
 								System.out.println("jsgui sent us a register query");
 								msg.setInstruction("register:gui");
 								m.setBody(msg.toJSON());
 								m.setHeader("valid-message", true);
 								my_sender = msg.getSender();
 								break;
-								
+
 							case "unregister":
 								msg.setInstruction("jsgui sent us an unregister query");
 								msg.setSender(my_sender);
 								m.setBody(msg.toJSON());
 								m.setHeader("valid-message", true);
 								break;
-								
+
 							case "ping":
-							
+
 								msg.setInstruction("jsgui sent us a ping request ping");
 								msg.setSender(my_sender);
 								m.setBody(msg.toJSON());
 								m.setHeader("valid-message", true);
 								break;
-								
+
 							case "pong":
-								
+
 								msg.setInstruction("jsgui sent us a pong answer");
 								msg.setSender(my_sender);
 								m.setBody(msg.toJSON());
 								m.setHeader("valid-message", true);
 								break;
-								
+
 							case "generate":
 								System.out.println("jsgui sent us a generate");
 								msg.generateDummy(Integer.valueOf(str_uncompressed.trim().split(":")[1]));
@@ -100,22 +100,35 @@ public class MyCamelServant {
 								m.setBody(msg.toJSON());
 								m.setHeader("valid-message", true);
 								break;
-								
+
 							case "solve":
 								System.out.println("jsgui sent us a solve");
-								msg.generateDummy(Integer.valueOf(str_uncompressed.trim().split(":")[1]));
+
+								// Generate 1D sudoku
+								String input = str_uncompressed.trim().split(":")[1];
+								String[] sudoku = input.split(",");
+								sudoku[0].replace("[", "");
+								sudoku[sudoku.length-1].replace("]","");
+
+								int[] sudoku1d = new int[sudoku.length];
+
+								for(int i=0; i<sudoku.length; i++) {
+									sudoku1d[i] = Integer.valueOf(sudoku[i]);
+								}
+
+								msg.setSudoku1D(sudoku1d);
 								msg.setInstruction("solve");
 								msg.setSender(my_sender);
 								m.setBody(msg.toJSON());
 								m.setHeader("valid-message", true);
 								break;
-								
+
 								default:
 									System.err.println("jsgui sent us the following unsupported message: " + str_uncompressed);
 									break;
-																
+
 							}
-							
+
 						}
 					}).choice().when(header("valid-message").isEqualTo(true)).to(broker_out).otherwise().to(dummy_out);
 
@@ -149,11 +162,11 @@ public class MyCamelServant {
 								m.setHeader("valid-message", true);
 
 								// create the target data for jsgui
-								
+
 								switch(recv_msg_obj.getInstruction()) {
-								
+
 								default:
-									
+
 									System.out.println("regardless of the instruction, i forward the entire json to jsgui");
 									m.setBody(in_string);
 									break;
@@ -163,7 +176,7 @@ public class MyCamelServant {
 							} catch (JsonSyntaxException ex) {
 								System.err.println("the message was rubbish and i'll drop it");
 							}
-							
+
 							m.setBody(Snappy.compress((String) m.getBody()));
 
 						}

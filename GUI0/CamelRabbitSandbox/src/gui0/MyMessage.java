@@ -20,7 +20,7 @@ public class MyMessage {
 	public void setSender(String uri) {
 		this.sender = uri;
 	}
-	
+
 	public String getSender() {
 		return this.sender;
 	}
@@ -33,15 +33,19 @@ public class MyMessage {
 			}
 		}
 	}
-	
+
+	public void setSudoku1D(int[] sudoku) {
+		this.sudoku = sudoku;
+	}
+
 	public int[] getSudoku() {
-		return this.sudoku;		
+		return this.sudoku;
 	}
 
 	public void setInstruction(String instruction) {
 		this.instruction = instruction;
 	}
-	
+
 	public String getInstruction() {
 		return this.instruction;
 	}
@@ -49,7 +53,7 @@ public class MyMessage {
 	public void generateDummy(int n) {
 		this.setSender("myUri");
 		this.setInstruction("register:gui");
-		
+
 		int[][] sudoku = new int[n][n];
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {

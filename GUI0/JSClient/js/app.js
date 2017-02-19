@@ -46,7 +46,7 @@ document.getElementById("btnPing").addEventListener("click", function(){
 
 document.getElementById("btnSolve").addEventListener("click", function(){
   var txt = document.getElementById("sudokuSize").value;
-  var myMessage = compressMyMessage("solve:" + txt);
+  var myMessage = compressMyMessage("solve:" + getJSONSudoku());
   log("Solve requested > " + ab2str(myMessage));
   connection.send(myMessage);
 });
@@ -189,9 +189,9 @@ function setSudokuArr(arr) {
         txt.readOnly = false;
 
         if(Math.floor(i/Math.sqrt(sz))%2 == 0 ^ Math.floor(j/Math.sqrt(sz))%2 == 0) {
-          txt.setAttribute('style','text-align: center; background-color : #f1f1f1;');
+          txt.setAttribute('style','text-align: center; background-color : #55ff55;');
         } else {
-          txt.setAttribute('style','text-align: center; background-color : #ffffff;');
+          txt.setAttribute('style','text-align: center; background-color : #55ff55;');
         }
 
       } else {
