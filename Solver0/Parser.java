@@ -1,5 +1,3 @@
-package SolverGID.SolverAID;
-
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.JSONObject;
@@ -8,7 +6,7 @@ import org.json.simple.parser.ParseException;
 public class Parser {
 
 	static String sender = "";
-
+static final String[] solvedResponses = {"solved:impossible","solved:one","solved:many","solved:illegal"};
 	public static String parse(String input) {
 
 		/* Test fuer korrekten Empfang */
@@ -18,9 +16,7 @@ public class Parser {
 		String request = "";
 		// String sender = "";
 		String instruction = "";
-
 		int[] sudoku = {};
-
 		String modInput = input.replace("|", "").replace(" ", "").replace("\r", "").replace("\n", "").replace("\t", "");
 
 		JSONParser parser = new JSONParser();
@@ -72,19 +68,13 @@ System.out.println("11");
 			try {
 				SudokuSolver sodokuSolver = new SudokuSolver(sudoku);
 				int solution = sodokuSolver.search();
-				if (solution == 0) {
-					return answerJSON(request, "solved:impossible", sudoku);
-				} else if (solution == 1) {
-					return answerJSON(request, "solved:one", sudoku);
-				} else if (solution == 2) {
-					return answerJSON(request, "solved:many", sudoku);
-				}
+				MainApp.logger.fine("Solution:  " + solvedResponses[solution]);
+				return answerJSON(request, solvedResponses[solution], sudoku);
 			} catch (Exception e) {
 				MainApp.logger.info(e.toString());
 				e.printStackTrace();
-				return answerJSON(request, "solved:illegal", sudoku);
+				return answerJSON(request, solvedResponses[3], sudoku);
 			}
-
 		default:
 			MainApp.logger.fine("Message Ignored: " + instruction);
 			// Rest interessiert uns nicht

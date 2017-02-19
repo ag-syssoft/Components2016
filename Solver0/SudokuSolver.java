@@ -1,5 +1,3 @@
-package SolverGID.SolverAID;
-
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.variables.IntVar;

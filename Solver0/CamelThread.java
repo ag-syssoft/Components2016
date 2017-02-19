@@ -1,5 +1,3 @@
-package SolverGID.SolverAID;
-
 import org.apache.camel.main.Main;
 
 public class CamelThread extends Thread {
