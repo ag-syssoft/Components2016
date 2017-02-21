@@ -17,6 +17,14 @@ class Message():
 		self.instruction = instruction
 		self.sudoku      = sudoku
 
+	def print(self):
+		print("Message:")
+		print(self.requestID)
+		print(self.instruction)
+		print(self.sender)
+		print(self.sudoku)
+		print("=======================")
+
 	def json (self):
 		message = {
 				'request-id': self.requestID,
