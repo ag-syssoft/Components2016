@@ -1,5 +1,3 @@
-package SolverGID.SolverAID;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -29,30 +27,32 @@ public class MainApp {
 
 	static final String broker0URI = "rabbitmq://136.199.51.111/inExchange?username=kompo&password=kompo&skipQueueDeclare=true";
 	static final String generator0URI = "restlet:http://136.199.26.133:80/api/message?restletMethod=post";
-	static final String solver0URI = "smtps://smtp.gmail.com?username=DUMMYMAIL&password=DUMMYWERT&subject="
-			+ "Solver" + "&to=" + "komposolver@gmail.com" + "&from=Broker0";
+	static String solver0URIout;
+	static String solver0URIin;
 	static Logger logger;
+
 	public static void main(String... args) throws Exception {
-		  logger = Logger.getLogger("MyLog");  
-		    FileHandler fh;  
-
-		    try {  
-		    	fh = new FileHandler("LogFile.txt");  
-		        logger.addHandler(fh);
-		        SimpleFormatter formatter = new SimpleFormatter();  
-		        fh.setFormatter(formatter);  
-		        logger.setLevel(Level.FINE);
-		        logger.fine("---- Log Init ----");  
-		    } catch (SecurityException e) {  
-		        e.printStackTrace();  
-		    } catch (IOException e) {  
-		        e.printStackTrace();  
-		    }  
-
-		
-		
-		
-		Parser.setSender(solver0URI);
+		logger = Logger.getLogger("MyLog");
+		FileHandler fh;
+		try {
+			fh = new FileHandler("LogFile.txt");
+			logger.addHandler(fh);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+			logger.setLevel(Level.FINE);
+			logger.fine("---- Log Init ----");
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		URI uri = URI.loadURI();
+		System.out.println("uri " + uri.in);
+        System.out.println("uri " + uri.out);
+		solver0URIin = uri.in;
+		solver0URIout = uri.out;
+		logger.fine(uri.in);
+		Parser.setSender(solver0URIout);
 		Main main = new Main();
 
 		main.addRouteBuilder(new MyRouteBuilder());
@@ -61,21 +61,29 @@ public class MainApp {
 
 		RegisterThread registerThread = new RegisterThread(main);
 		registerThread.start();
+
 		RegisterThread unregisterThread = new RegisterThread(main, false);
+
+
+
 		JPanel jpanel = new JPanel();
-		JButton jButton = new JButton("Unregister");
-		jButton.addActionListener(new ActionListener() {
+		JButton jButtonUnregister = new JButton("Unregister");
+		jButtonUnregister.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				unregisterThread.start();
+			}
+		});
+		jButtonUnregister.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				unregisterThread.start();
 			}
 		});
-		
-		
 		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(new Pinger(main), 4*60000,4*60000);
-		
+		timer.scheduleAtFixedRate(new Pinger(main), 4 * 60000, 4 * 60000);
+
 		JButton jButtonTest = new JButton("Testen");
 
 		jButtonTest.addActionListener(new ActionListener() {
@@ -112,7 +120,7 @@ public class MainApp {
 
 			}
 		});
-		jpanel.add(jButton);
+		jpanel.add(jButtonUnregister);
 		jpanel.add(jButtonTest);
 		jpanel.add(jButtonPing);
 		JFrame jFrame = new JFrame();
@@ -125,16 +133,17 @@ public class MainApp {
 		// send to default endpoint
 
 	}
-	static final String REQUEST_ID ="request-id";
+
+	static final String REQUEST_ID = "request-id";
 	static final String SENDER = "sender";
-	static final String INSTRUCTION ="instruction";
+	static final String INSTRUCTION = "instruction";
 	static final String SUDOKU = "sudoku";
+
 	static String testBody() {
 		UUID id = UUID.randomUUID();
 		JSONObject object = new JSONObject();
 		object.put(REQUEST_ID, id.toString());
-		object.put(SENDER,
-				solver0URI);
+		object.put(SENDER, solver0URIout);
 
 		object.put(INSTRUCTION, "solve");
 
@@ -142,25 +151,23 @@ public class MainApp {
 		String sudoko = "0,0,0,25,1,2,0,5,0,4,25,7,0,9,8,7,6,17,19,24,21,16,11,0,0";
 		String soduko = "0,0,0,0,1,0,7,5,0,7,4,8,6,0,0,3,0,1,3,0,0,0,9,4,0,0,0,1,0,4,0,0,6,5,0,7,5,9,0,0,7,0,0,3,0,0,0,0,0,4,8,0,0,0,4,3,0,1,0,0,0,0,2,9,0,2,0,0,0,6,4,0,8,0,7,0,5,0,9,1,0";
 		String[] tokens = sudoko.split(",");
-		for(int j = 0; j<25;j++){
-		for (int i = 0; i < tokens.length; i++) {
-			try {
-				sudokuArray.add(Integer.parseInt(tokens[i]));
-			} catch (Exception e) {
-				sudokuArray.add(0);
+		for (int j = 0; j < 25; j++) {
+			for (int i = 0; i < tokens.length; i++) {
+				try {
+					sudokuArray.add(Integer.parseInt(tokens[i]));
+				} catch (Exception e) {
+					sudokuArray.add(0);
+				}
 			}
-		}
 		}
 
 		object.put(SUDOKU, sudokuArray);
 
 		String answer = object.toJSONString();
 		String answer2 = answer.replace("\\", "");
-		logger.severe("Test: " +answer2);
+		logger.severe("Test: " + answer2);
 		return answer2;
 
 	}
-
-	
 
 }

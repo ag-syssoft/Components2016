@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+  <title>Sudoku Client</title>
+  <script src="js/snappyjs.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+  <script src="js/realTimeChartMulti.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.2/build/pure-min.css" integrity="sha384-UQiGfs9ICog+LwheBSRCt1o5cbyKIHbwjWscjemyBMT9YCUMZffs6UqUTd0hObXD" crossorigin="anonymous">
+  <link rel="stylesheet" href="jsclient.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <div id="myApp">
+    <p>
+      <form class="pure-form">
+        <a id="btnRegister" class="pure-button pure-button-primary" href="#">Register as GUI</a>
+        <a id="btnUnregister" class="pure-button pure-button-primary" href="#">Unregister</a>
+        <a id="btnPing" class="pure-button pure-button-primary" href="#">Ping</a>
+        <a id="btnSolve" class="pure-button pure-button-primary" href="#">Solve</a>
+        <a id="btnGenerate" class="pure-button pure-button-primary" href="#">Generate</a>
+        <input id="sudokuSize" class="pure-input-rounded" style="text-align: center;" size=3/>
+        <input id="sudokuDiff" class="pure-input-rounded" style="text-align: center;" size=1/>
+        <a id="btnCreateSudoku" class="pure-button pure-button-primary" href="#">Create Sudoku</a>
+        <a id="btnRndSudoku" class="pure-button pure-button-primary" href="#">Randomize Sudoku</a>
+      </form>
+    </p>
+    <hr>
+    <p>
+      <form class="pure-form">
+        <a id="btnShowSolve" class="pure-button button-error" href="#">Show Solve Messages</a>
+        <a id="btnShowLog" class="pure-button button-error" href="#">Show Log Messages</a>
+      </form>
+    </p>
+    <hr>
+    <div id="sudoku"></div>
+    <hr>
+    <div id="viewDiv"></div>
+    <hr>
+    <div id="myConsole"></div>
+  </div>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -11,9 +11,8 @@ from Bridge import *
 class Handler():
     global reqDictionary
 
-    # TODO sender Address **hier oder in __init__**
     senderAddress = ""
-    bridge= None
+    bridge = None
 
     """
     [key]   - reqID             - current request GUID
@@ -48,13 +47,20 @@ class Handler():
             print("length of sudoku not valid ~> stopping handleGenerate..")
             return
 
+        if (len(msg.sudoku) == 1):
+            msgToSend = Message(requestID=msg.requestID, senderAddress=self.senderAddress, instruction="display", sudoku=[[0]])
+            self.bridge.send(msgToSend)
+            print("done.. sudokuSize = 1..")
+            return
+
         k = int(math.sqrt(len(msg.sudoku)))
+        numberOfFields = k*k*k*k
         difficulty = msg.instruction[-1:]
         sudoku = generateFilledSudoku(k)
 
         # initial cleanup (remove 8 numbers)
-        print("initial cleanup (remove 8 numbers)..")
-        sudoku, cleanedNumbers = emptyField(sudoku,8)
+        print("initial cleanup (remove numberOfFields/10 numbers)..")
+        sudoku, cleanedNumbers = emptyField(sudoku,int(numberOfFields/10))
         rID = Message.createGUID().urn[9:]
         reqDictionary[rID] = (difficulty, sudoku, cleanedNumbers, (set()), msg.requestID)
 
@@ -87,6 +93,7 @@ class Handler():
         print(percentCounter)
 
         sudoku = msg.sudoku
+        print(percentCounter)
 
         # check if we are done or if need still need to 'empty' fields (difficulty)
         print("check if we are done or if need still need to 'empty' fields..")
@@ -130,24 +137,32 @@ class Handler():
         sudoku = msg.sudoku
         sudoku[lastNumber[0]][lastNumber[1]] = finishedSudoku[lastNumber[0]][lastNumber[1]]
 
-        # Check whether the number has already been removed
-        print("check wether the number has already been removed..")
-        if (len(memorySet) == len(sudoku)):
+        # get number of fields with numbers
+        filledCounter = 0
+        for row in sudoku:
+            for elem in row:
+                if elem != 0:
+                    filledCounter = filledCounter + 1
+
+        # Check if we tried all fields on this 'level'
+        print("check if we tried all fields on this 'level'..")
+        if (len(memorySet) == filledCounter):
+            print("we tried all fields on this level, we need to recover the previous 'level'..")
             lastNumber = reqDictionary[msg.requestID][2].pop()
             sudoku[lastNumber[0]][lastNumber[1]] = finishedSudoku[lastNumber[0]][lastNumber[1]]
             memorySet = set()
 
-        # remove numbers and check if already removed
-        print("remove numbers and check if already removed..")
+        # remove a field
+        print("remove a field..")
         sudoku, cleanedNumbers = emptyField(sudoku,1)
-        memorySet = memorySet.add(cleanedNumbers[0])
+        memorySet.add(cleanedNumbers[0])
         cleanedNumbers = oldNumbers + cleanedNumbers
         rID = Message.createGUID().urn[9:]
         reqDictionary[rID] = (difficulty, finishedSudoku, cleanedNumbers, memorySet, firstID)
 
         # send camel-msg to broker (request to solver)
         msgToSend = Message(requestID=rID, senderAddress=self.senderAddress, instruction="solve", sudoku=sudoku)
-        print("send generated stuff..")
+        print("send solvedMany stuff..")
         self.bridge.send(msgToSend)
 
 

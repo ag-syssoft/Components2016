@@ -32,7 +32,7 @@ public class CamelInstance {
                      throws IOException
                  {
                                 for(Route r:context.getRoutes()){
-                                        System.out.println(r.getId()+"  "+r.getEndpoint().getEndpointUri());
+                                        System.out.println("ROUTES: "+r.getId());
                                 }
                      String routingKey = envelope.getRoutingKey();
                      long deliveryTag = envelope.getDeliveryTag();
@@ -54,7 +54,15 @@ public class CamelInstance {
                         context.addRoutes(new RouteBuilder() {
                                 @Override
                                 public void configure() throws Exception {
-                                        from("rabbitmq://136.199.51.111/out?username=kompo&password=kompo&queue="+id+"&skipQueueDeclare=true")
+                                        
+					if(uri.contains("urlencode")){
+						from("rabbitmq://136.199.51.111/out?username=kompo&password=kompo&queue="+id+"&skipQueueDeclare=true")
+						.id(id).to(uri);
+					}else{
+
+
+					from("rabbitmq://136.199.51.111/out?username=kompo&password=kompo&queue="+id+"&skipQueueDeclare=true")
+					.id(id)
 					.process(new Processor() {
                                          @Override
                                           public void process(Exchange exchange) throws Exception
@@ -63,13 +71,14 @@ public class CamelInstance {
                                            toProcess.setHeader(Exchange.CONTENT_TYPE, MediaType.APPLICATION_JSON);
                                            byte[] body = (byte[])toProcess.getBody();
 					   toProcess.setHeader(Exchange.CONTENT_LENGTH,body.length);
-                                           System.out.println("Sent message ("+uri+"): "+new String(body));
+                                           System.out.println("Sent message ("+uri+"): "+new String(body).substring(0,Math.min(body.length,30)));
                                            exchange.setOut(toProcess);
 
                                           }
 
                                         })
-					.id(id).to(uri);
+					.to(uri);
+					}
                                         System.out.println("Added route from RoutingKey "+id+" to "+uri);
                                 }
                         });

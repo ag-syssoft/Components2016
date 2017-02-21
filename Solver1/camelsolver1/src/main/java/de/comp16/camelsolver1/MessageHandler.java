@@ -20,8 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class MessageHandler {
 	
-	public static final String OWN_URI = "http://136.199.51.110:8080/rest_api/solve?httpMethodRestrict=POST";
-	public static final String BROKER_URI = "rabbitmq://136.199.51.111/inExchange?username=kompo&password=kompo&skipQueueDeclare=true";
+	public static final String OWN_URI = "restlet:http://136.199.51.110:8080/rest_api/solve?restletMethod=post";
+	public static final String BROKER_URI = "rabbitmq://136.199.51.111/inExchange?username=kompo&password=kompo&skipQueueDeclare=true&exchangeType=fanout&autoDelete=false";
 	public static final String[] SOLVE_INSTRUCTION= new String[]{"solved:impossible","solved:one","solved:many"};
 	
 	@EndpointInject(uri="direct:out")
@@ -37,15 +37,25 @@ public class MessageHandler {
 //		System.out.println(in_message.getRequest_id());
 //		System.out.println(in_message.getSender());
 
-		//TODO Validate message
-		
 		String nowAsISO = ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ).replace(':', '-');
-		System.out.println("[sendMessage] Incoming Message (at "+nowAsISO+"):");
+
+		if (in_message == null) {
+			System.out.println("[MessageHandler] Incoming Message (at "+nowAsISO+") IS NULL!");
+			return;
+		}
+		//TODO Validate message
+		if (in_message.getInstruction() == null || in_message.getRequest_id() == null || 
+				in_message.getSender() == null || in_message.getSudoku() == null ) {
+			System.out.println("[MessageHandler] Incoming Message (at "+nowAsISO+") INVALID!");
+			return;
+		}
+
+		System.out.println("[MessageHandler] Incoming Message (at "+nowAsISO+"):");
 		printMessage(in_message);
 		
 		if (in_message.getInstruction().equals("solve")) {
 			Sudoku toSolve = new Sudoku(in_message.getSudoku());
-			System.out.println("[postMessage] Incoming Sudoku:\n"+toSolve.toString());
+			System.out.println("[MessageHandler] Incoming Sudoku:\n"+toSolve.toString());
 			
 			SudokuSolver solver = new SudokuSolver(toSolve);
 			int result = solver.solve();
