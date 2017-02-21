@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.42</groupId>
-	<artifactId>camelGenerator</artifactId>
+	<artifactId>RestletAPI_Test</artifactId>
 	<packaging>jar</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 

@@ -1,4 +1,4 @@
-package com.camelGenerator;
+package com.RestletAPI_Test;
 
 import org.apache.camel.main.Main;
 
