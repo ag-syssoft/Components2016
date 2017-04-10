@@ -51,7 +51,6 @@ public class MainApp {
         System.out.println("uri " + uri.out);
 		solver0URIin = uri.in;
 		solver0URIout = uri.out;
-		logger.fine(uri.in);
 		Parser.setSender(solver0URIout);
 		Main main = new Main();
 
