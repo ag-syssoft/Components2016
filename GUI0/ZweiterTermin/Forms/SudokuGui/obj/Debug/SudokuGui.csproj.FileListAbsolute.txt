@@ -1,0 +1,11 @@
+C:\Users\C\ct_ws1617_project\Forms\SudokuGui\bin\Debug\SudokuGui.exe.config
+C:\Users\C\ct_ws1617_project\Forms\SudokuGui\bin\Debug\SudokuGui.exe
+C:\Users\C\ct_ws1617_project\Forms\SudokuGui\bin\Debug\SudokuGui.pdb
+C:\Users\C\ct_ws1617_project\Forms\SudokuGui\bin\Debug\Newtonsoft.Json.dll
+C:\Users\C\ct_ws1617_project\Forms\SudokuGui\bin\Debug\Newtonsoft.Json.xml
+C:\Users\C\ct_ws1617_project\Forms\SudokuGui\obj\Debug\SudokuGui.Form1.resources
+C:\Users\C\ct_ws1617_project\Forms\SudokuGui\obj\Debug\SudokuGui.Properties.Resources.resources
+C:\Users\C\ct_ws1617_project\Forms\SudokuGui\obj\Debug\SudokuGui.csproj.GenerateResource.Cache
+C:\Users\C\ct_ws1617_project\Forms\SudokuGui\obj\Debug\SudokuGui.exe
+C:\Users\C\ct_ws1617_project\Forms\SudokuGui\obj\Debug\SudokuGui.pdb
+C:\Users\C\ct_ws1617_project\Forms\SudokuGui\obj\Debug\SudokuGui.csprojResolveAssemblyReference.cache
